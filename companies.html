@@ -4,85 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>企業別 — SustainaLog</title>
-  <meta name="description" content="CSR・サステナビリティ活動を業界・企業別に探せます。">
+  <meta name="description" content="国内上場企業のCSR・サステナビリティ活動を企業・業界別に探せます。">
   <link rel="stylesheet" href="style.css">
   <style>
-    .industry-section { margin-bottom: 56px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .industry-section { margin-bottom: 52px; }
     .industry-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; padding-bottom: 14px;
       border-bottom: 2px solid var(--green-100);
     }
     .industry-badge {
-      background: var(--green-100);
-      color: var(--green-700);
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 99px;
+      background: var(--green-100); color: var(--green-700);
+      font-size: 0.75rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 99px;
     }
-    .industry-title {
-      font-family: var(--font-serif);
-      font-size: 1.3rem;
-      color: var(--ink-900);
+    .industry-title { font-family: var(--font-serif); font-size: 1.25rem; color: var(--ink-900); }
+    .company-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
+    @media (max-width: 640px) { .company-grid { grid-template-columns: 1fr; } }
     .company-list-card {
-      background: var(--white);
-      border: 1px solid var(--ink-100);
-      border-radius: var(--radius-lg);
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      background: var(--white); border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg); padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
       transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-      cursor: pointer;
+      text-decoration: none;
     }
     .company-list-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+      transform: translateY(-2px); box-shadow: var(--shadow-md);
       border-color: var(--green-300);
     }
     .company-list-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: var(--radius-md);
-      background: var(--green-50);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      flex-shrink: 0;
+      width: 48px; height: 48px; border-radius: var(--radius-md);
+      background: var(--green-50); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
     }
     .company-list-info { flex: 1; min-width: 0; }
-    .company-list-name { font-weight: 700; font-size: 0.95rem; color: var(--ink-900); margin-bottom: 3px; }
-    .company-list-sub { font-size: 0.8rem; color: var(--ink-300); }
+    .company-list-name { font-weight: 700; font-size: 0.92rem; color: var(--ink-900); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .company-list-sub { font-size: 0.76rem; color: var(--ink-400); }
+    .company-list-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
     .company-list-count {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--green-600);
-      background: var(--green-50);
-      padding: 4px 10px;
-      border-radius: 99px;
-      flex-shrink: 0;
+      font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700;
+      color: var(--green-600); background: var(--green-50);
+      padding: 3px 9px; border-radius: 99px;
     }
-    .company-list-arrow { color: var(--ink-200); font-size: 1rem; transition: transform var(--transition); }
-    .company-list-card:hover .company-list-arrow { transform: translateX(4px); color: var(--green-600); }
-    .coming-soon-overlay {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--ink-300);
-      background: var(--cream);
-      border: 1.5px dashed var(--ink-100);
-      padding: 6px 12px;
-      border-radius: 99px;
+    .company-list-score {
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-300);
     }
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-bottom: 40px;
+    }
+    @media (max-width: 640px) { .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+    .stat-box {
+      background: var(--white); border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg); padding: 20px 16px; text-align: center;
+    }
+    .stat-box-num { font-family: var(--font-serif); font-size: 1.9rem; color: var(--green-700); line-height: 1; margin-bottom: 6px; }
+    .stat-box-label { font-size: 0.78rem; color: var(--ink-400); }
   </style>
 </head>
 <body>
@@ -99,109 +82,70 @@
 
 <section class="section">
   <div class="container">
-
-    <!-- Stats Bar -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:48px;">
-      ${[
-        {num:'87', label:'掲載企業数'},
-        {num:'18', label:'業界カテゴリ'},
-        {num:'248', label:'収録記事数'},
-        {num:'毎日', label:'情報更新'},
-      ].map(s=>`
-        <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-lg);padding:20px;text-align:center;">
-          <div style="font-family:var(--font-serif);font-size:1.8rem;color:var(--green-700);margin-bottom:4px;">${s.num}</div>
-          <div style="font-size:0.8rem;color:var(--ink-300);">${s.label}</div>
-        </div>
-      `).join('')}
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-box-num" id="stat-cos">—</div><div class="stat-box-label">掲載企業数</div></div>
+      <div class="stat-box"><div class="stat-box-num" id="stat-arts">—</div><div class="stat-box-label">公開記事数</div></div>
+      <div class="stat-box"><div class="stat-box-num" id="stat-inds">—</div><div class="stat-box-label">業界カテゴリ</div></div>
     </div>
-
-    <!-- Search -->
-    <div class="search-wrap" style="max-width:360px;margin-bottom:40px;">
+    <div class="search-wrap" style="max-width:360px;margin-bottom:36px;">
       <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" class="search-input" placeholder="企業名で検索..." id="companySearch" oninput="filterCompanies()">
+      <input type="text" class="search-input" placeholder="企業名・業界で検索..." id="companySearch" oninput="filterCompanies()">
     </div>
-
-    <!-- Companies by Industry -->
-    <div id="companies-by-industry"></div>
-
-    <!-- Coming Soon Banner -->
-    <div style="background:var(--green-50);border:1px solid var(--green-200);border-radius:var(--radius-xl);padding:40px;text-align:center;margin-top:32px;">
-      <p style="font-size:1.5rem;margin-bottom:12px;">🚀</p>
-      <h3 style="font-family:var(--font-serif);font-size:1.2rem;color:var(--green-800);margin-bottom:8px;">企業別詳細ページを準備中</h3>
-      <p style="font-size:0.88rem;color:var(--ink-500);">各企業のサステナビリティ活動履歴・スコア・トレンドグラフなどを掲載予定です。</p>
+    <div id="companies-by-industry">
+      <div style="text-align:center;padding:64px 0;">
+        <div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;"></div>
+        <p style="color:var(--ink-300);font-size:.88rem;">企業データを読み込み中...</p>
+      </div>
     </div>
   </div>
 </section>
 
 <div id="footer-mount"></div>
 
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
+<script src="public-data.js"></script>
 <script src="data.js"></script>
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('companies.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
-
-const COMPANIES_EXTENDED = [
-  { name: "トヨタ自動車",             industry: "自動車",         count: 12, icon: "🚗", listed: "東証プライム", code: "7203" },
-  { name: "本田技研工業",             industry: "自動車",         count: 8,  icon: "🏍️", listed: "東証プライム", code: "7267" },
-  { name: "日産自動車",               industry: "自動車",         count: 6,  icon: "🚙", listed: "東証プライム", code: "7201" },
-  { name: "ソニーグループ",           industry: "電機・精密機器", count: 9,  icon: "🎮", listed: "東証プライム", code: "6758" },
-  { name: "パナソニックHD",           industry: "電機・精密機器", count: 8,  icon: "⚡", listed: "東証プライム", code: "6752" },
-  { name: "富士フイルムHD",           industry: "電機・精密機器", count: 5,  icon: "📸", listed: "東証プライム", code: "4901" },
-  { name: "みずほFG",                 industry: "金融・銀行",     count: 6,  icon: "🏦", listed: "東証プライム", code: "8411" },
-  { name: "三菱UFJ FG",              industry: "金融・銀行",     count: 7,  icon: "🏛️", listed: "東証プライム", code: "8306" },
-  { name: "NTTグループ",              industry: "通信・IT",       count: 11, icon: "📡", listed: "東証プライム", code: "9432" },
-  { name: "ソフトバンクグループ",     industry: "通信・IT",       count: 7,  icon: "📱", listed: "東証プライム", code: "9984" },
-  { name: "アサヒグループHD",         industry: "食品・飲料",     count: 4,  icon: "🍺", listed: "東証プライム", code: "2502" },
-  { name: "キリンホールディングス",   industry: "食品・飲料",     count: 5,  icon: "🍻", listed: "東証プライム", code: "2503" },
-  { name: "ファミリーマート",         industry: "小売・コンビニ", count: 5,  icon: "🏪", listed: "伊藤忠傘下",   code: "—" },
-  { name: "イオングループ",           industry: "小売・コンビニ", count: 6,  icon: "🛒", listed: "東証プライム", code: "8267" },
-  { name: "リクルートHD",             industry: "サービス・HR",   count: 7,  icon: "💼", listed: "東証プライム", code: "6098" },
-  { name: "電通グループ",             industry: "サービス・HR",   count: 3,  icon: "📢", listed: "東証プライム", code: "4324" },
-];
-
-function filterCompanies() {
-  const q = document.getElementById('companySearch').value.toLowerCase();
-  const filtered = q
-    ? COMPANIES_EXTENDED.filter(c => c.name.toLowerCase().includes(q) || c.industry.toLowerCase().includes(q))
-    : COMPANIES_EXTENDED;
-  renderByIndustry(filtered);
-}
-
+let _allSummaries = [];
+let _loaded = false;
+function scoreToRankLabel(s) { return s>=22?'S':s>=18?'A':s>=13?'B':s>=8?'C':'D'; }
+function scoreToRankColor(s) { return s>=22?'#6a1fd1':s>=18?'#1565c0':s>=13?'#2e7d32':s>=8?'#f57c00':'#c62828'; }
 function renderByIndustry(list) {
-  const industries = [...new Set(list.map(c => c.industry))];
   const container = document.getElementById('companies-by-industry');
-  if (list.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🌿</div><h3>企業が見つかりません</h3><p>検索条件を変えてお試しください。</p></div>`;
-    return;
-  }
+  if (list.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌿</div><h3>企業が覯つかりません</h3><p >検索条件を変えてお馱しください。</p></div>'; return; }
+  const industries = [...new Set(list.map(c=>c.industry).filter(Boolean))];
   container.innerHTML = industries.map(ind => {
-    const comps = list.filter(c => c.industry === ind);
-    return `
-      <div class="industry-section animate-in">
-        <div class="industry-header">
-          <h2 class="industry-title">${ind}</h2>
-          <span class="industry-badge">${comps.length}社</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-          ${comps.map(c => `
-            <a href="articles.html" class="company-list-card">
-              <div class="company-list-icon">${c.icon}</div>
-              <div class="company-list-info">
-                <div class="company-list-name">${c.name}</div>
-                <div class="company-list-sub">${c.listed} ${c.code !== '—' ? c.code : ''}</div>
-              </div>
-              <span class="company-list-count">${c.count}件</span>
-              <span class="company-list-arrow">→</span>
-            </a>
-          `).join('')}
-        </div>
-      </div>
-    `;
+    const comps = list.filter(c=>c.industry===ind);
+    return `<div class="industry-section animate-in"><div class="industry-header"><h2 class="industry-title">${ind}</h2><span class="industry-badge">${comps.length}社</span></div><div class="company-grid">${comps.map(c=>{
+      const nameEnc=encodeURIComponent(c.company_name);
+      const sl=c.avg_score>0?`平均${scoreToRankLabel(c.avg_score)}（${c.avg_score}）`:'';
+      const tick=c.ticker?`${c.ticker} · `:'';
+      const mkt=(typeof MARKET_LABEL!=='undefined'&&MARKET_LABEL[c.market])||c.market||'';
+      return `<a href="company.html?name=${nameEnc}" class="company-list-card"><div class="company-list-icon">${c.icon||'🏢'}</div><div class="company-list-info"><div class="company-list-name">${c.company_name}</div><div class="company-list-sub">${tick}${mkt}</div></div><div class="company-list-meta"><span class="company-list-count">${c.article_count}件</span>${sl?'<span class="company-list-score">'+sl+'</span>':''}</div></a>`;
+    }).join('')}</div></div>`;
   }).join('');
   initScrollAnimations();
 }
-
-filterCompanies();
+function filterCompanies() {
+  if(!_loaded)return;
+  const q=(document.getElementById('companySearch').value||'').toLowerCase();
+  renderByIndustry(q?_allSummaries.filter(c=>c.company_name.toLowerCase().includes(q)||(c.industry||'').toLowerCase().includes(q)||(c.ticker||'').includes(q)):_allSummaries);
+}
+(async()=>{
+  await loadPublicArticles();
+  _allSummaries=getCompanySummaries();
+  _loaded=true;
+  const inds=new Set(_allSummaries.map(c=>c.industry).filter(Boolean));
+  const totArts=_allSummaries.reduce((s,c)=>s+c.article_count,0);
+  document.getElementById('stat-cos').textContent=_allSummaries.length||'—';
+  document.getElementById('stat-arts').textContent=totArts||'—';
+  document.getElementById('stat-inds').textContent=inds.size||'—';
+  filterCompanies();
+})();
 </script>
 </body>
 </html>
