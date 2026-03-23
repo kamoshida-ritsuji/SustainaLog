@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>企業比較 — SustainaLog</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    /* ─── Page wrapper ─── */
+    .cmp-wrap { animation: fadeIn .3s ease; }
+
+    /* ─── Selector row ─── */
+    .cmp-selector-row {
+      display: grid;
+      grid-template-columns: 1fr 56px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 36px;
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-xl);
+      padding: 20px 24px;
+    }
+    @media (max-width: 600px) {
+      .cmp-selector-row { grid-template-columns: 1fr; padding: 16px; }
+      .cmp-vs-col { text-align: center; padding: 4px 0; }
+    }
+    .cmp-selector-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .label-a { color: var(--green-600); }
+    .label-b { color: #1565c0; }
+    .cmp-select {
+      width: 100%;
+      border: 2px solid var(--ink-100);
+      border-radius: var(--radius-md);
+      padding: 10px 36px 10px 12px;
+      font-size: .9rem; color: var(--ink-800);
+      background: var(--white);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color var(--transition);
+    }
+    .cmp-select:focus { outline: none; border-color: var(--green-400); }
+    .cmp-select.has-a:focus { border-color: var(--green-400); }
+    .cmp-select.has-a { border-color: var(--green-300); }
+    .cmp-select.has-b { border-color: #93c5fd; }
+    .cmp-vs-col {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cmp-vs-badge {
+      font-family: var(--font-serif);
+      font-size: 1rem; font-weight: 700;
+      color: var(--ink-400);
+      background: var(--ink-50, #fafafa);
+      border: 1px solid var(--ink-100);
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none;
+    }
+
+    /* ─── Empty state ─── */
+    .cmp-empty {
+      text-align: center;
+      padding: 72px 24px;
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-xl);
+    }
+    .cmp-empty-icon { font-size: 3.5rem; margin-bottom: 20px; }
+    .cmp-empty-title {
+      font-family: var(--font-serif);
+      font-size: 1.4rem; color: var(--ink-800); margin-bottom: 10px;
+    }
+    .cmp-empty-sub { font-size: .88rem; color: var(--ink-400); max-width: 360px; margin: 0 auto; line-height: 1.7; }
+
+    /* ─── Company header cards ─── */
+    .cmp-co-headers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 560px) { .cmp-co-headers { grid-template-columns: 1fr; } }
+    .cmp-co-card {
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+    }
+    .cmp-co-card.a {
+      background: var(--green-50);
+      border: 2px solid var(--green-200);
+    }
+    .cmp-co-card.b {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+    }
+    .cmp-co-icon { font-size: 2.4rem; margin-bottom: 8px; }
+    .cmp-co-name {
+      font-family: var(--font-serif);
+      font-size: clamp(.96rem, 2.5vw, 1.15rem);
+      color: var(--ink-900); font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .cmp-co-meta { font-size: .72rem; color: var(--ink-400); margin-bottom: 12px; }
+    .cmp-go-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .75rem; font-weight: 600;
+      padding: 5px 14px; border-radius: 99px;
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    .cmp-go-link.a {
+      color: var(--green-700); background: var(--green-100);
+      border: 1px solid var(--green-300);
+    }
+    .cmp-go-link.a:hover { background: var(--green-200); }
+    .cmp-go-link.b {
+      color: #1565c0; background: #dbeafe;
+      border: 1px solid #93c5fd;
+    }
+    .cmp-go-link.b:hover { background: #bfdbfe; }
+
+    /* ─── Compare table ─── */
+    /*
+     * 拡張ポイント: 業界平均3列目を追加するときは
+     * grid-template-columns を 1fr 1fr 1fr に変更し
+     * 各セルに3列目を追加するだけでOK
+     */
+    .cmp-section-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--ink-300);
+      margin: 32px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--ink-100);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cmp-section-icon { font-size: 1rem; }
+
+    .cmp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 560px) { .cmp-grid { grid-template-columns: 1fr; } }
+
+    .cmp-cell {
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      min-height: 80px;
+    }
+    .cmp-cell.a-cell { border-top: 3px solid var(--green-400); }
+    .cmp-cell.b-cell { border-top: 3px solid #60a5fa; }
+
+    /* KPI cells */
+    .cmp-kpi-num {
+      font-family: var(--font-serif);
+      font-size: 2rem; line-height: 1; margin-bottom: 4px;
+    }
+    .cmp-kpi-num.a { color: var(--green-700); }
+    .cmp-kpi-num.b { color: #1565c0; }
+    .cmp-kpi-sub { font-size: .72rem; color: var(--ink-400); }
+    .cmp-rank-label {
+      font-family: var(--font-mono);
+      font-size: 2.2rem; font-weight: 700; line-height: 1;
+    }
+    .cmp-score-sub { font-size: .72rem; color: var(--ink-400); margin-top: 4px; }
+
+    /* Winner badge */
+    .cmp-winner {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .64rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 99px;
+      margin-top: 8px;
+    }
+    .win-a  { background: var(--green-50); color: var(--green-700); border: 1px solid var(--green-200); }
+    .win-b  { background: #eff6ff; color: #1565c0; border: 1px solid #bfdbfe; }
+    .win-tie { background: var(--ink-50, #fafafa); color: var(--ink-400); border: 1px solid var(--ink-100); }
+
+    /* Theme pills */
+    .cmp-pill-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+    .cmp-pill { font-size: .7rem; padding: 4px 10px; border-radius: 99px; }
+
+    /* Activity bars */
+    .cmp-act-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .cmp-act-lbl { font-size: .64rem; color: var(--ink-400); width: 28px; flex-shrink: 0; }
+    .cmp-act-track {
+      flex: 1; height: 6px;
+      background: var(--ink-100); border-radius: 3px; overflow: hidden;
+    }
+    .cmp-act-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+    .cmp-act-cnt { font-size: .62rem; font-family: var(--font-mono); color: var(--ink-400); width: 16px; text-align: right; flex-shrink: 0; }
+
+    /* Article list */
+    .cmp-art-row {
+      display: flex; gap: 8px; padding: 7px 0;
+      border-bottom: 1px solid var(--ink-100);
+      text-decoration: none;
+    }
+    .cmp-art-row:last-child { border-bottom: none; }
+    .cmp-art-row:hover .cmp-art-title { color: var(--green-600); }
+    .cmp-art-ic { font-size: .9rem; flex-shrink: 0; padding-top: 1px; }
+    .cmp-art-title { font-size: .76rem; color: var(--ink-700); line-height: 1.4; }
+    .cmp-art-date  { font-size: .64rem; color: var(--ink-400); margin-top: 2px; }
+
+    /* Full-width diff banner */
+    .cmp-diff-banner {
+      background: linear-gradient(135deg, var(--green-50) 0%, #eff6ff 100%);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex; gap: 24px; flex-wrap: wrap;
+      margin-bottom: 32px;
+      font-size: .8rem;
+    }
+    .cmp-diff-item { display: flex; flex-direction: column; gap: 2px; }
+    .cmp-diff-label { font-size: .64rem; color: var(--ink-400); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .cmp-diff-val   { font-weight: 700; color: var(--ink-800); font-family: var(--font-mono); }
+  </style>
+</head>
+<body>
+<div id="header-mount"></div>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">Compare</p>
+    <h1>企業比較</h1>
+    <p>2社のCSR・サステナビリティ活動を並べて比較できます。</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Selector -->
+    <div class="cmp-selector-row">
+      <div>
+        <div class="cmp-selector-label label-a">企業 A</div>
+        <select class="cmp-select" id="sel-a" onchange="onSelectChange()">
+          <option value="">-- 企業を選択 --</option>
+        </select>
+      </div>
+      <div class="cmp-vs-col">
+        <div class="cmp-vs-badge">VS</div>
+      </div>
+      <div>
+        <div class="cmp-selector-label label-b">企業 B</div>
+        <select class="cmp-select" id="sel-b" onchange="onSelectChange()">
+          <option value="">-- 企業を選択 --</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="cmp-result">
+      <div style="text-align:center;padding:72px 0;">
+        <div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px;"></div>
+        <p style="color:var(--ink-300);font-size:.9rem;">データを読み込み中…</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div id="footer-mount"></div>
+
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
+<script src="public-data.js"></script>
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('compare.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+// ─────────────────────────────────────────────────
+// Utility helpers
+// ─────────────────────────────────────────────────
+
+function rankLabel(score) {
+  if (score >= 22) return { label: 'S', color: '#6a1fd1' };
+  if (score >= 18) return { label: 'A', color: '#1565c0' };
+  if (score >= 13) return { label: 'B', color: '#2e7d32' };
+  if (score >= 8)  return { label: 'C', color: '#f57c00' };
+  return { label: 'D', color: '#c62828' };
+}
+
+/**
+ * 月別活動データ（直近N ヶ月）を返す
+ * 拡張ポイント: getMonthlyActivity(co, 12) で12ヶ月に変更可
+ */
+function getMonthlyActivity(co, months = 6) {
+  const now = new Date();
+  return Array.from({ length: months }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1);
+    const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    const cnt = co.articles.filter(a => {
+      const ad = new Date(a.published_at || a.fetched_at || '');
+      if (isNaN(ad)) return false;
+      return `${ad.getFullYear()}/${String(ad.getMonth()+1).padStart(2,'0')}` === key;
+    }).length;
+    return { label: `${d.getMonth()+1}月`, value: cnt };
+  });
+}
+
+// ─────────────────────────────────────────────────
+// Render helpers
+// ─────────────────────────────────────────────────
+
+/** 勝敗バッジ */
+function winBadge(vA, vB, higherIsBetter = true) {
+  if (vA === 0 && vB === 0) return '';
+  const aWins = higherIsBetter ? vA > vB : vA < vB;
+  const bWins = higherIsBetter ? vB > vA : vB < vA;
+  if (aWins) return `<div class="cmp-winner win-a">▲ A が優勢</div>`;
+  if (bWins) return `<div class="cmp-winner win-b">▲ B が優勢</div>`;
+  return `<div class="cmp-winner win-tie">= 同率</div>`;
+}
+
+/** テーマピル */
+function themePills(co) {
+  const csrMeta = (typeof CSR_TYPE_META !== 'undefined') ? CSR_TYPE_META : {};
+  if (!co.themes || co.themes.length === 0)
+    return `<span style="font-size:.76rem;color:var(--ink-300);">データなし</span>`;
+  return `<div class="cmp-pill-wrap">${co.themes.map(t => {
+    const m = csrMeta[t] || {};
+    return `<a href="theme.html?name=${encodeURIComponent(t)}" class="cmp-pill" style="background:${m.color||'#d8f3dc'};color:${m.accent||'#2d6a4f'};text-decoration:none;">${m.icon||''} ${t}</a>`;
+  }).join('')}</div>`;
+}
+
+/** 月別活動バー */
+function actBars(monthly, fillColor) {
+  const max = Math.max(...monthly.map(m => m.value), 1);
+  return monthly.map(m => `
+    <div class="cmp-act-row">
+      <span class="cmp-act-lbl">${m.label}</span>
+      <div class="cmp-act-track">
+        <div class="cmp-act-fill" style="width:${Math.round((m.value/max)*100)}%;background:${fillColor};"></div>
+      </div>
+      <span class="cmp-act-cnt">${m.value}</span>
+    </div>`).join('');
+}
+
+/** 最新記事リスト */
+function artList(co, maxItems = 3) {
+  const csrMeta = (typeof CSR_TYPE_META !== 'undefined') ? CSR_TYPE_META : {};
+  const arts = co.articles.slice(0, maxItems);
+  if (arts.length === 0)
+    return `<span style="font-size:.76rem;color:var(--ink-300);">記事なし</span>`;
+  return arts.map(a => {
+    const m = csrMeta[a.csr_type] || {};
+    return `<a href="article.html?slug=${a.slug}" class="cmp-art-row">
+      <span class="cmp-art-ic">${m.icon || '📋'}</span>
+      <div>
+        <div class="cmp-art-title">${a.translated_title || a.title || ''}</div>
+        <div class="cmp-art-date">${formatDate(a.published_at || a.fetched_at || '')}</div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────
+// Main render
+// ─────────────────────────────────────────────────
+
+/**
+ * 比較ビューを描画
+ *
+ * 拡張ポイント（業界平均を追加する場合）:
+ *   1. coAvg を第3引数で受け取る
+ *   2. cmp-co-headers / cmp-grid を 3列に変更（grid-template-columns: 1fr 1fr 1fr）
+ *   3. 各セクションに3列目のセルを追加
+ */
+function renderComparison(coA, coB) {
+  const mount = document.getElementById('cmp-result');
+  const mktLabel = m => (typeof MARKET_LABEL !== 'undefined' && MARKET_LABEL[m]) || m || '';
+
+  // Empty states
+  if (!coA && !coB) {
+    mount.innerHTML = `
+      <div class="cmp-empty">
+        <div class="cmp-empty-icon">🔍</div>
+        <div class="cmp-empty-title">企業を選んで比較する</div>
+        <div class="cmp-empty-sub">上のセレクトボックスから比較したい企業をそれぞれ選ぶと、CSR活動の比較表が表示されます。</div>
+      </div>`;
+    return;
+  }
+  if (!coA || !coB) {
+    const co = coA || coB;
+    const side = coA ? 'B' : 'A';
+    mount.innerHTML = `
+      <div class="cmp-empty">
+        <div class="cmp-empty-icon">${co.icon || '🏢'}</div>
+        <div class="cmp-empty-title">${co.company_name}</div>
+        <div class="cmp-empty-sub">企業 ${side} も選択すると比較が始まります。</div>
+      </div>`;
+    return;
+  }
+
+  // Derived values
+  const rkA = coA.avg_score > 0 ? rankLabel(coA.avg_score) : { label: '—', color: 'var(--ink-300)' };
+  const rkB = coB.avg_score > 0 ? rankLabel(coB.avg_score) : { label: '—', color: 'var(--ink-300)' };
+  const monthlyA = getMonthlyActivity(coA, 6);
+  const monthlyB = getMonthlyActivity(coB, 6);
+  const actTotalA = monthlyA.reduce((s, m) => s + m.value, 0);
+  const actTotalB = monthlyB.reduce((s, m) => s + m.value, 0);
+  const scoreWin = (() => {
+    if (coA.avg_score === coB.avg_score) return `<div class="cmp-winner win-tie">= 同スコア</div>`;
+    if (coA.avg_score > coB.avg_score) return `<div class="cmp-winner win-a">▲ A が高い</div>`;
+    return `<div class="cmp-winner win-b">▲ B が高い</div>`;
+  })();
+  const scoreDiff = Math.abs(coA.avg_score - coB.avg_score);
+  const artDiff   = Math.abs(coA.article_count - coB.article_count);
+  const actDiff   = Math.abs(actTotalA - actTotalB);
+
+  mount.innerHTML = `<div class="cmp-wrap">
+
+    <!-- Company header cards -->
+    <div class="cmp-co-headers">
+      <div class="cmp-co-card a">
+        <div class="cmp-co-icon">${coA.icon || '🏢'}</div>
+        <div class="cmp-co-name">${coA.company_name}</div>
+        <div class="cmp-co-meta">${coA.industry || ''}${mktLabel(coA.market) ? ' · ' + mktLabel(coA.market) : ''}${coA.ticker ? ' · ' + coA.ticker : ''}</div>
+        <a href="company.html?name=${encodeURIComponent(coA.company_name)}" class="cmp-go-link a">企業ページへ →</a>
+      </div>
+      <div class="cmp-co-card b">
+        <div class="cmp-co-icon">${coB.icon || '🏢'}</div>
+        <div class="cmp-co-name">${coB.company_name}</div>
+        <div class="cmp-co-meta">${coB.industry || ''}${mktLabel(coB.market) ? ' · ' + mktLabel(coB.market) : ''}${coB.ticker ? ' · ' + coB.ticker : ''}</div>
+        <a href="company.html?name=${encodeURIComponent(coB.company_name)}" class="cmp-go-link b">企業ページへ →</a>
+      </div>
+    </div>
+
+    <!-- Diff summary banner -->
+    <div class="cmp-diff-banner">
+      <div class="cmp-diff-item">
+        <span class="cmp-diff-label">記事数の差</span>
+        <span class="cmp-diff-val">${artDiff > 0 ? (artDiff + '件') : '同数'}</span>
+      </div>
+      <div class="cmp-diff-item">
+        <span class="cmp-diff-label">スコア差</span>
+        <span class="cmp-diff-val">${scoreDiff > 0 ? (scoreDiff + 'pt') : '同点'}</span>
+      </div>
+      <div class="cmp-diff-item">
+        <span class="cmp-diff-label">6ヶ月活動差</span>
+        <span class="cmp-diff-val">${actDiff > 0 ? (actDiff + '件') : '同数'}</span>
+      </div>
+      <div class="cmp-diff-item">
+        <span class="cmp-diff-label">業界</span>
+        <span class="cmp-diff-val" style="font-family:inherit;font-size:.8rem;">${coA.industry === coB.industry ? '同業界' : '異業界'}</span>
+      </div>
+    </div>
+
+    <!-- Section: 基本指標 -->
+    <div class="cmp-section-label"><span class="cmp-section-icon">📊</span> 基本指標</div>
+    <div class="cmp-grid">
+      <div class="cmp-cell a-cell">
+        <div class="cmp-kpi-sub" style="margin-bottom:4px;">公開記事数</div>
+        <div class="cmp-kpi-num a">${coA.article_count}<span style="font-family:var(--font-sans);font-size:.9rem;color:var(--ink-400);"> 件</span></div>
+        ${winBadge(coA.article_count, coB.article_count)}
+      </div>
+      <div class="cmp-cell b-cell">
+        <div class="cmp-kpi-sub" style="margin-bottom:4px;">公開記事数</div>
+        <div class="cmp-kpi-num b">${coB.article_count}<span style="font-family:var(--font-sans);font-size:.9rem;color:var(--ink-400);"> 件</span></div>
+        ${winBadge(coB.article_count, coA.article_count)}
+      </div>
+    </div>
+
+    <!-- Section: 平均スコア -->
+    <div class="cmp-section-label"><span class="cmp-section-icon">⭐</span> CSRスコア</div>
+    <div class="cmp-grid">
+      <div class="cmp-cell a-cell">
+        <div class="cmp-kpi-sub" style="margin-bottom:4px;">平均スコアランク</div>
+        <div class="cmp-rank-label" style="color:${rkA.color};">${rkA.label}</div>
+        <div class="cmp-score-sub">${coA.avg_score > 0 ? coA.avg_score + ' / 25点' : 'データなし'}</div>
+        ${scoreWin}
+      </div>
+      <div class="cmp-cell b-cell">
+        <div class="cmp-kpi-sub" style="margin-bottom:4px;">平均スコアランク</div>
+        <div class="cmp-rank-label" style="color:${rkB.color};">${rkB.label}</div>
+        <div class="cmp-score-sub">${coB.avg_score > 0 ? coB.avg_score + ' / 25点' : 'データなし'}</div>
+        ${scoreWin}
+      </div>
+    </div>
+
+    <!-- Section: 主なテーマ -->
+    <div class="cmp-section-label"><span class="cmp-section-icon">🏷️</span> 主なCSRテーマ（上位4件）</div>
+    <div class="cmp-grid">
+      <div class="cmp-cell a-cell">${themePills(coA)}</div>
+      <div class="cmp-cell b-cell">${themePills(coB)}</div>
+    </div>
+
+    <!-- Section: 活動頻度 -->
+    <div class="cmp-section-label"><span class="cmp-section-icon">📅</span> 最近の活動頻度（直近6ヶ月）</div>
+    <div class="cmp-grid">
+      <div class="cmp-cell a-cell">
+        ${actBars(monthlyA, 'var(--green-500)')}
+        <div style="margin-top:8px;font-size:.72rem;color:var(--ink-400);">合計 <strong>${actTotalA}</strong> 件
+          ${winBadge(actTotalA, actTotalB)}
+        </div>
+      </div>
+      <div class="cmp-cell b-cell">
+        ${actBars(monthlyB, '#60a5fa')}
+        <div style="margin-top:8px;font-size:.72rem;color:var(--ink-400);">合計 <strong>${actTotalB}</strong> 件
+          ${winBadge(actTotalB, actTotalA)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: 最新記事 -->
+    <div class="cmp-section-label"><span class="cmp-section-icon">📰</span> 最新記事（最大3件）</div>
+    <div class="cmp-grid" style="margin-bottom:48px;">
+      <div class="cmp-cell a-cell" style="min-height:auto;">${artList(coA, 3)}</div>
+      <div class="cmp-cell b-cell" style="min-height:auto;">${artList(coB, 3)}</div>
+    </div>
+
+  </div>`;
+}
+
+// ─────────────────────────────────────────────────
+// URL params & select binding
+// ─────────────────────────────────────────────────
+
+const params = new URLSearchParams(window.location.search);
+let pA = params.get('a') ? decodeURIComponent(params.get('a')) : '';
+let pB = params.get('b') ? decodeURIComponent(params.get('b')) : '';
+
+function onSelectChange() {
+  const nameA = document.getElementById('sel-a').value;
+  const nameB = document.getElementById('sel-b').value;
+
+  // Sync URL
+  const u = new URL(window.location.href);
+  nameA ? u.searchParams.set('a', nameA) : u.searchParams.delete('a');
+  nameB ? u.searchParams.set('b', nameB) : u.searchParams.delete('b');
+  window.history.replaceState({}, '', u.toString());
+
+  // Select style
+  document.getElementById('sel-a').className = 'cmp-select' + (nameA ? ' has-a' : '');
+  document.getElementById('sel-b').className = 'cmp-select' + (nameB ? ' has-b' : '');
+
+  renderComparison(
+    nameA ? getCompanySummaryByName(nameA) : null,
+    nameB ? getCompanySummaryByName(nameB) : null
+  );
+}
+
+// ─────────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────────
+(async () => {
+  await loadPublicArticles();
+
+  const all = getCompanySummaries();
+
+  // Build grouped selects
+  ['sel-a', 'sel-b'].forEach((id, idx) => {
+    const sel = document.getElementById(id);
+    const cur = idx === 0 ? pA : pB;
+
+    // Group by industry
+    const byInd = {};
+    all.forEach(c => {
+      const ind = c.industry || 'その他';
+      if (!byInd[ind]) byInd[ind] = [];
+      byInd[ind].push(c);
+    });
+
+    Object.keys(byInd).sort().forEach(ind => {
+      const grp = document.createElement('optgroup');
+      grp.label = ind;
+      byInd[ind].forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.company_name;
+        opt.textContent = `${c.icon || ''} ${c.company_name}${c.article_count > 0 ? ' (' + c.article_count + '件)' : ''}`;
+        if (c.company_name === cur) opt.selected = true;
+        grp.appendChild(opt);
+      });
+      sel.appendChild(grp);
+    });
+
+    if (cur) sel.className = `cmp-select ${idx === 0 ? 'has-a' : 'has-b'}`;
+  });
+
+  renderComparison(
+    pA ? getCompanySummaryByName(pA) : null,
+    pB ? getCompanySummaryByName(pB) : null
+  );
+})();
+</script>
+</body>
+</html>
