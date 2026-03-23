@@ -7,81 +7,80 @@
   <meta name="description" content="CSR・サステナビリティ活動をテーマ別に探せます。">
   <link rel="stylesheet" href="style.css">
   <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .themes-grid-main {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 900px) { .themes-grid-main { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .themes-grid-main { grid-template-columns: 1fr; } }
     .theme-card-big {
       background: var(--white);
       border: 1px solid var(--ink-100);
       border-radius: var(--radius-xl);
       overflow: hidden;
-      transition: transform var(--transition), box-shadow var(--transition);
-      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      text-decoration: none;
+      display: block;
     }
     .theme-card-big:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--green-300);
     }
     .theme-card-header {
-      padding: 32px 28px 24px;
+      padding: 24px 22px 18px;
       display: flex;
       align-items: flex-start;
-      gap: 16px;
+      gap: 14px;
     }
     .theme-icon-big {
-      width: 64px;
-      height: 64px;
+      width: 56px; height: 56px;
       border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; flex-shrink: 0;
     }
     .theme-card-title {
       font-family: var(--font-serif);
-      font-size: 1.2rem;
-      color: var(--ink-900);
-      margin-bottom: 6px;
+      font-size: 1.05rem; color: var(--ink-900); margin-bottom: 6px;
     }
-    .theme-card-desc {
-      font-size: 0.82rem;
-      color: var(--ink-500);
-      line-height: 1.6;
+    .theme-card-meta {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      font-size: .78rem; color: var(--ink-400);
+    }
+    .theme-card-count {
+      font-family: var(--font-mono); font-weight: 700;
+    }
+    .theme-score-badge {
+      font-family: var(--font-mono); font-size: .72rem;
+      padding: 2px 8px; border-radius: 99px;
+      background: var(--ink-50, #f9f9f9); color: var(--ink-400);
     }
     .theme-card-footer {
-      padding: 16px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 12px 22px 16px;
+      display: flex; justify-content: space-between; align-items: center;
       border-top: 1px solid var(--ink-100);
-      background: var(--cream-light);
     }
-    .theme-progress {
-      width: 100%;
-      height: 4px;
-      background: var(--ink-100);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 12px;
+    .theme-company-pills {
+      display: flex; flex-wrap: wrap; gap: 4px; padding: 0 22px 16px;
     }
-    .theme-progress-bar {
-      height: 100%;
-      border-radius: 2px;
-      background: var(--green-500);
-      transition: width 1s ease;
-    }
-    .theme-keywords {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 28px 24px;
-    }
-    .theme-keyword {
-      font-size: 0.72rem;
-      color: var(--ink-400, #9a9490);
-      background: var(--cream);
-      padding: 3px 10px;
-      border-radius: 99px;
+    .theme-company-pill {
+      font-size: .7rem; padding: 2px 8px; border-radius: 99px;
+      background: var(--cream); color: var(--ink-500);
       border: 1px solid var(--ink-100);
     }
+    .stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-bottom: 40px;
+    }
+    @media (max-width: 560px) { .stat-row { gap: 8px; } }
+    .stat-box {
+      background: var(--white); border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg); padding: 18px 14px; text-align: center;
+    }
+    .stat-box-num { font-family: var(--font-serif); font-size: 1.8rem; color: var(--green-700); line-height: 1; margin-bottom: 5px; }
+    .stat-box-label { font-size: .76rem; color: var(--ink-400); }
   </style>
 </head>
 <body>
@@ -92,152 +91,135 @@
   <div class="container">
     <p class="page-hero-label">Themes</p>
     <h1>テーマから探す</h1>
-    <p>SDGs・ESG・TNFDなど、主要フレームワークに対応したテーマカテゴリで活動を分類しています。</p>
+    <p>CSR大分類ごとに企業活動を整理・比較できます。</p>
   </div>
 </div>
 
 <section class="section">
   <div class="container">
 
-    <!-- SDGs Reference Banner -->
-    <div style="background:linear-gradient(135deg,var(--green-800),var(--green-700));border-radius:var(--radius-xl);padding:32px 40px;margin-bottom:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-      <div>
-        <p style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-300);margin-bottom:8px;">Framework Alignment</p>
-        <h3 style="font-family:var(--font-serif);font-size:1.3rem;color:var(--cream);margin-bottom:6px;">SDGs・GRI・TCFD・TNFDに対応</h3>
-        <p style="font-size:0.84rem;color:var(--green-200);">各テーマは国際的なサステナビリティフレームワークに紐づけて分類しています。</p>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        ${['SDGs','GRI','TCFD','TNFD','ESG'].map(f=>`
-          <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--green-100);font-size:0.75rem;font-weight:700;padding:6px 14px;border-radius:99px;">${f}</span>
-        `).join('')}
+    <!-- Stats -->
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-box-num" id="stat-themes">—</div><div class="stat-box-label">テーマ数</div></div>
+      <div class="stat-box"><div class="stat-box-num" id="stat-arts">—</div><div class="stat-box-label">公開記事数</div></div>
+      <div class="stat-box"><div class="stat-box-num" id="stat-cos">—</div><div class="stat-box-label">掲載企業数</div></div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap" style="max-width:320px;margin-bottom:36px;">
+      <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" class="search-input" placeholder="テーマ名で検索..." id="themeSearch" oninput="filterThemes()">
+    </div>
+
+    <!-- Themes grid -->
+    <div id="themes-grid">
+      <div style="text-align:center;padding:64px 0;">
+        <div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;"></div>
+        <p style="color:var(--ink-300);font-size:.88rem;">テーマデータを読み込み中...</p>
       </div>
     </div>
 
-    <!-- Themes Grid -->
-    <div id="themes-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;"></div>
-
-    <!-- Coming Soon -->
-    <div style="background:var(--green-50);border:1px dashed var(--green-300);border-radius:var(--radius-xl);padding:40px;text-align:center;margin-top:48px;">
-      <p style="font-size:1.4rem;margin-bottom:12px;">📊</p>
-      <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--green-800);margin-bottom:8px;">テーマ別トレンドグラフを準備中</h3>
-      <p style="font-size:0.86rem;color:var(--ink-500);">テーマ別の企業活動トレンド・業界比較グラフを近日公開予定です。</p>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="empty-state-icon">🌿</div>
+      <h3>テーマが見つかりません</h3>
+      <p>検索条件を変えてお試しください。</p>
     </div>
   </div>
 </section>
 
 <div id="footer-mount"></div>
 
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
+<script src="public-data.js"></script>
 <script src="data.js"></script>
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('themes.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
 
-const THEMES_EXTENDED = [
-  {
-    name: "気候変動・脱炭素",
-    icon: "🌡️",
-    count: 24,
-    color: "#d8f3dc",
-    accent: "#2d6a4f",
-    desc: "温室効果ガス削減・RE100・カーボンオフセット・TCFD開示など、気候変動対応に関する企業活動を集約しています。",
-    keywords: ["カーボンニュートラル","RE100","TCFD","SBT","グリーンボンド","Scope3"],
-    maxCount: 30,
-  },
-  {
-    name: "循環経済・廃棄物削減",
-    icon: "♻️",
-    count: 18,
-    color: "#fef9ef",
-    accent: "#c9a84c",
-    desc: "プラスチック削減・リサイクル推進・廃棄物ゼロ・サーキュラーエコノミーへの移行に関する活動を収録。",
-    keywords: ["プラスチックフリー","リサイクル","廃棄物ゼロ","サーキュラー","包装材"],
-    maxCount: 30,
-  },
-  {
-    name: "生物多様性",
-    icon: "🌿",
-    count: 11,
-    color: "#e8f4ec",
-    accent: "#40916c",
-    desc: "TNFD対応・自然資本保全・生態系サービスへの取組みを整理。2030年ネイチャーポジティブ目標への貢献度を追跡。",
-    keywords: ["TNFD","ネイチャーポジティブ","生態系","自然資本","森林保全"],
-    maxCount: 30,
-  },
-  {
-    name: "ESG金融",
-    icon: "📊",
-    count: 15,
-    color: "#f0f4ff",
-    accent: "#3b64c8",
-    desc: "グリーンボンド・ソーシャルボンド・ESG投資・インパクト投資など金融セクターのサステナビリティ活動を掲載。",
-    keywords: ["グリーンボンド","ESG投資","インパクト投資","SFDR","タクソノミー"],
-    maxCount: 30,
-  },
-  {
-    name: "教育・人材育成",
-    icon: "🎓",
-    count: 9,
-    color: "#fff3f0",
-    accent: "#b5522a",
-    desc: "従業員研修・リスキリング・次世代人材育成・インターンシップ・奨学金など人的資本への投資を追跡。",
-    keywords: ["リスキリング","人的資本","D&I","奨学金","デジタル教育"],
-    maxCount: 30,
-  },
-  {
-    name: "水・資源保全",
-    icon: "💧",
-    count: 8,
-    color: "#e8f6ff",
-    accent: "#2b6cb0",
-    desc: "水ストレス対応・ウォータースチュワードシップ・希少資源の節約・鉱物サプライチェーン管理に関する活動。",
-    keywords: ["AWS","水ストレス","節水","希少金属","マテリアリティ"],
-    maxCount: 30,
-  },
-  {
-    name: "食品ロス削減",
-    icon: "🍱",
-    count: 7,
-    color: "#fff8ec",
-    accent: "#b87333",
-    desc: "食品廃棄削減・フードバンク連携・需要予測AI活用・賞味期限延長技術など食ロス対策の企業事例を収録。",
-    keywords: ["フードロス","フードバンク","需要予測","賞味期限","廃棄コスト"],
-    maxCount: 30,
-  },
-  {
-    name: "地域社会・コミュニティ",
-    icon: "🤝",
-    count: 10,
-    color: "#f5f0ff",
-    accent: "#6b46c1",
-    desc: "地域振興・被災地支援・文化財保護・地域雇用創出など、地域コミュニティへの貢献活動を掲載。",
-    keywords: ["地域創生","社会貢献","被災地支援","ボランティア","共助"],
-    maxCount: 30,
-  },
-];
+let _allThemes = [];
+let _loaded = false;
 
-document.getElementById('themes-grid').innerHTML = THEMES_EXTENDED.map(t => `
-  <a href="articles.html" class="theme-card-big animate-in">
-    <div class="theme-card-header">
-      <div class="theme-icon-big" style="background:${t.color};color:${t.accent}">${t.icon}</div>
-      <div>
-        <h3 class="theme-card-title">${t.name}</h3>
-        <p class="theme-card-desc">${t.desc}</p>
-        <div class="theme-progress">
-          <div class="theme-progress-bar" style="width:${Math.round(t.count/t.maxCount*100)}%;background:${t.accent};"></div>
+function scoreColor(s) {
+  if (s >= 22) return '#6a1fd1'; if (s >= 18) return '#1565c0';
+  if (s >= 13) return '#2e7d32'; if (s >= 8)  return '#f57c00';
+  return '#c62828';
+}
+function scoreLabel(s) {
+  if (s >= 22) return 'S'; if (s >= 18) return 'A';
+  if (s >= 13) return 'B'; if (s >= 8)  return 'C'; return 'D';
+}
+
+function renderThemeGrid(list) {
+  const grid  = document.getElementById('themes-grid');
+  const empty = document.getElementById('empty-state');
+  if (list.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.className = 'themes-grid-main';
+  grid.innerHTML = list.map(t => {
+    const nameEnc = encodeURIComponent(t.name);
+    const rank    = t.avg_score > 0 ? scoreLabel(t.avg_score) : '';
+    const rankCol = t.avg_score > 0 ? scoreColor(t.avg_score) : '';
+    const cosSlice = t.companies.slice(0, 4);
+    const moreCount = t.companies.length - cosSlice.length;
+    return `
+      <a href="theme.html?name=${nameEnc}" class="theme-card-big animate-in">
+        <div class="theme-card-header">
+          <div class="theme-icon-big" style="background:${t.color};color:${t.accent};">${t.icon}</div>
+          <div style="flex:1;min-width:0;">
+            <h3 class="theme-card-title">${t.name}</h3>
+            <div class="theme-card-meta">
+              <span class="theme-card-count" style="color:${t.accent};">${t.article_count}件の記事</span>
+              ${rank ? `<span class="theme-score-badge" style="color:${rankCol};background:${t.color};">平均${rank}(${t.avg_score}点)</span>` : ''}
+              <span>${t.companies.length}社</span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div class="theme-keywords">
-      ${t.keywords.map(k=>`<span class="theme-keyword">${k}</span>`).join('')}
-    </div>
-    <div class="theme-card-footer">
-      <span style="font-size:0.82rem;color:var(--ink-500);">${t.count}件の記事</span>
-      <span style="font-size:0.82rem;font-weight:700;color:${t.accent};">記事を見る →</span>
-    </div>
-  </a>
-`).join('');
+        ${cosSlice.length > 0 ? `
+        <div class="theme-company-pills">
+          ${cosSlice.map(c => `<span class="theme-company-pill">${c}</span>`).join('')}
+          ${moreCount > 0 ? `<span class="theme-company-pill">+${moreCount}</span>` : ''}
+        </div>` : ''}
+        <div class="theme-card-footer">
+          <span style="font-size:.78rem;color:var(--ink-400);">
+            ${t.latest_date ? formatDate(t.latest_date) + ' 更新' : '記事なし'}
+          </span>
+          <span style="font-size:.82rem;font-weight:700;color:${t.accent};">詳細を見る →</span>
+        </div>
+      </a>
+    `;
+  }).join('');
+  initScrollAnimations();
+}
 
-initScrollAnimations();
+function filterThemes() {
+  if (!_loaded) return;
+  const q = (document.getElementById('themeSearch').value || '').toLowerCase();
+  const filtered = q
+    ? _allThemes.filter(t => t.name.toLowerCase().includes(q))
+    : _allThemes;
+  renderThemeGrid(filtered);
+}
+
+(async () => {
+  await loadPublicArticles();
+  _allThemes = getThemeSummaries();
+  _loaded = true;
+
+  // Stats
+  const totalArts = _allThemes.reduce((s, t) => s + t.article_count, 0);
+  const allCos    = new Set(_allThemes.flatMap(t => t.companies));
+  document.getElementById('stat-themes').textContent = _allThemes.filter(t => t.article_count > 0).length || _allThemes.length;
+  document.getElementById('stat-arts').textContent   = totalArts || '—';
+  document.getElementById('stat-cos').textContent    = allCos.size || '—';
+
+  renderThemeGrid(_allThemes);
+})();
 </script>
 </body>
 </html>

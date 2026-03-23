@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テーマ詳細 — SustainaLog</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Hero */
+    .th-hero { padding: 48px 0 0; }
+    .th-hero-inner { display: flex; align-items: flex-end; gap: 20px; padding-bottom: 40px; flex-wrap: wrap; }
+    .th-icon-wrap {
+      width: 80px; height: 80px; border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem; flex-shrink: 0; background: rgba(255,255,255,.18);
+    }
+    .th-hero-body { flex: 1; min-width: 0; }
+    .th-hero-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; opacity: .7; }
+    .th-hero-name { font-family: var(--font-serif); font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--cream); line-height: 1.2; margin-bottom: 0; }
+
+    /* Stats */
+    .th-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--ink-100); overflow: hidden;
+    }
+    @media (max-width: 600px) { .th-stats { grid-template-columns: repeat(2, 1fr); } }
+    .th-stat { padding: 18px 14px; text-align: center; border-right: 1px solid var(--ink-100); }
+    .th-stat:last-child { border-right: none; }
+    .th-stat-num { font-family: var(--font-serif); font-size: 1.8rem; color: var(--green-700); line-height: 1; margin-bottom: 5px; }
+    .th-stat-label { font-size: .73rem; color: var(--ink-400); }
+
+    /* Layout */
+    .th-layout { display: grid; grid-template-columns: 1fr 280px; gap: 32px; margin-top: 36px; }
+    @media (max-width: 900px) { .th-layout { grid-template-columns: 1fr; } }
+
+    /* Section title */
+    .th-section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--ink-300);
+      margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+
+    /* Sidebar */
+    .th-sidebar-card {
+      background: var(--white); border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 18px;
+    }
+    .th-sidebar-title { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-400); margin-bottom: 12px; }
+
+    /* Company list */
+    .th-company-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--ink-100);
+      text-decoration: none;
+    }
+    .th-company-item:last-child { border-bottom: none; }
+    .th-company-icon { font-size: 1.2rem; width: 32px; height: 32px; background: var(--green-50); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .th-company-name { font-size: .84rem; font-weight: 600; color: var(--ink-800); }
+    .th-company-count { font-size: .72rem; font-family: var(--font-mono); color: var(--green-600); margin-left: auto; }
+    .th-company-item:hover .th-company-name { color: var(--green-700); }
+
+    /* Score bar */
+    .th-score-bar { height: 6px; background: var(--ink-100); border-radius: 3px; overflow: hidden; margin: 4px 0 2px; }
+    .th-score-fill { height: 100%; border-radius: 3px; }
+
+    /* Tags */
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-item { font-size: .72rem; padding: 3px 10px; border-radius: 99px; background: var(--cream); color: var(--ink-500); border: 1px solid var(--ink-100); }
+
+    /* Back link */
+    .th-back { display: inline-flex; align-items: center; gap: 6px; font-size: .84rem; color: var(--green-400); margin-bottom: 24px; transition: gap var(--transition); }
+    .th-back:hover { gap: 10px; color: var(--green-300); }
+
+    /* Activity bars */
+    .act-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .act-label { font-size: .74rem; color: var(--ink-500); width: 56px; flex-shrink: 0; }
+    .act-track { flex: 1; height: 5px; background: var(--ink-100); border-radius: 3px; overflow: hidden; }
+    .act-fill { height: 100%; background: var(--green-400); border-radius: 3px; }
+    .act-count { font-size: .7rem; font-family: var(--font-mono); color: var(--ink-300); width: 24px; text-align: right; }
+  </style>
+</head>
+<body>
+<div id="header-mount"></div>
+<div id="th-mount">
+  <div style="text-align:center;padding:96px 24px;">
+    <div style="width:40px;height:40px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px;"></div>
+    <p style="color:var(--ink-300);font-size:.9rem;">テーマデータを読み込み中...</p>
+  </div>
+</div>
+<div id="footer-mount"></div>
+
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
+<script src="public-data.js"></script>
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('themes.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+const params    = new URLSearchParams(window.location.search);
+const themeName = params.get('name');
+
+function scoreColor(s) {
+  if (s >= 22) return '#6a1fd1'; if (s >= 18) return '#1565c0';
+  if (s >= 13) return '#2e7d32'; if (s >= 8)  return '#f57c00';
+  return '#c62828';
+}
+function scoreLabel(s) {
+  if (s >= 22) return 'S'; if (s >= 18) return 'A';
+  if (s >= 13) return 'B'; if (s >= 8)  return 'C'; return 'D';
+}
+
+(async () => {
+  await loadPublicArticles();
+
+  const th    = themeName ? getThemeSummaryByName(decodeURIComponent(themeName)) : null;
+  const mount = document.getElementById('th-mount');
+
+  if (!th) {
+    mount.innerHTML = `
+      <div class="container" style="padding:80px 24px;text-align:center;">
+        <p style="font-size:3rem;margin-bottom:16px;">🌿</p>
+        <h2 style="font-family:var(--font-serif);margin-bottom:12px;">テーマが見つかりませんでした</h2>
+        <p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いただくか、テーマ一覧からお探しください。</p>
+        <a href="themes.html" class="btn btn-primary">テーマ一覧へ</a>
+      </div>`;
+    return;
+  }
+
+  document.title = th.name + ' — SustainaLog';
+
+  const avgRank  = th.avg_score > 0 ? scoreLabel(th.avg_score) : '—';
+  const avgColor = th.avg_score > 0 ? scoreColor(th.avg_score) : 'var(--ink-300)';
+
+  // 月別活動頻度（直近6ヶ月）
+  const now = new Date();
+  const mMap = {};
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    mMap[`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`] = 0;
+  }
+  th.articles.forEach(a => {
+    const d = new Date(a.published_at || a.fetched_at || '');
+    if (!isNaN(d)) {
+      const k = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+      if (k in mMap) mMap[k]++;
+    }
+  });
+  const maxM = Math.max(...Object.values(mMap), 1);
+  const actHtml = Object.entries(mMap).map(([k, v]) => `
+    <div class="act-bar">
+      <span class="act-label">${k.slice(5)}月</span>
+      <div class="act-track"><div class="act-fill" style="width:${Math.round((v/maxM)*100)}%"></div></div>
+      <span class="act-count">${v}</span>
+    </div>`).join('');
+
+  // 関連企業（記事数降順）
+  const coCount = {};
+  th.articles.forEach(a => {
+    if (a.company_name) coCount[a.company_name] = (coCount[a.company_name] || 0) + 1;
+  });
+  const coList = Object.entries(coCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const allSummaries = getCompanySummaries();
+  const coHtml = coList.map(([name, cnt]) => {
+    const cs = allSummaries.find(c => c.company_name === name);
+    const icon = cs ? cs.icon : '🏢';
+    return `
+      <a href="company.html?name=${encodeURIComponent(name)}" class="th-company-item">
+        <div class="th-company-icon">${icon}</div>
+        <span class="th-company-name">${name}</span>
+        <span class="th-company-count">${cnt}件</span>
+      </a>`;
+  }).join('');
+
+  // classification_tags 収集（全記事から）
+  const tagSet = new Set();
+  th.articles.forEach(a => {
+    const tags = Array.isArray(a.classification_tags)
+      ? a.classification_tags
+      : (a.classification_tags || '').split(',').map(s => s.trim()).filter(Boolean);
+    tags.forEach(t => { if (t) tagSet.add(t); });
+  });
+  const tagHtml = [...tagSet].slice(0, 12)
+    .map(t => `<span class="tag-item">${t}</span>`).join('');
+
+  // csr_subtype 収集
+  const subSet = new Set();
+  th.articles.forEach(a => { if (a.csr_subtype) subSet.add(a.csr_subtype); });
+  const subHtml = [...subSet].map(s => `<span class="tag-item">${s}</span>`).join('');
+
+  // 最新記事（最大6件）
+  const recent = th.articles.slice(0, 6).map(adaptArticleForUI);
+  const recHtml = recent.length > 0
+    ? `<div class="articles-grid">${recent.map(renderCard).join('')}</div>`
+    : `<p style="color:var(--ink-300);font-size:.88rem;padding:24px 0;">公開記事がまだありません</p>`;
+
+  mount.innerHTML = `
+    <!-- Hero -->
+    <div class="th-hero" style="background:linear-gradient(135deg, ${th.accent}dd, ${th.accent}99);">
+      <div class="container">
+        <a href="themes.html" class="th-back">← テーマ一覧に戻る</a>
+        <div class="th-hero-inner">
+          <div class="th-icon-wrap">${th.icon}</div>
+          <div class="th-hero-body">
+            <p class="th-hero-eyebrow" style="color:rgba(255,255,255,.8);">CSR Theme</p>
+            <h1 class="th-hero-name">${th.name}</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="container">
+      <div class="th-stats">
+        <div class="th-stat">
+          <div class="th-stat-num">${th.article_count}</div>
+          <div class="th-stat-label">公開記事数</div>
+        </div>
+        <div class="th-stat">
+          <div class="th-stat-num" style="color:${avgColor};">${avgRank}</div>
+          <div class="th-stat-label">平均スコアランク</div>
+        </div>
+        <div class="th-stat">
+          <div class="th-stat-num">${th.avg_score > 0 ? th.avg_score : '—'}</div>
+          <div class="th-stat-label">平均スコア（/25）</div>
+        </div>
+        <div class="th-stat">
+          <div class="th-stat-num">${th.companies.length}</div>
+          <div class="th-stat-label">関連企業数</div>
+        </div>
+      </div>
+
+      <!-- 2-column layout -->
+      <div class="th-layout">
+        <!-- Main -->
+        <div>
+          <!-- サブタイプタグ -->
+          ${subHtml ? `
+          <div style="margin-bottom:28px;">
+            <div class="th-section-title">サブカテゴリ</div>
+            <div class="tag-list">${subHtml}</div>
+          </div>` : ''}
+
+          <!-- 最新記事 -->
+          <div>
+            <div class="th-section-title">最新の掲載記事（${th.article_count}件中 最新${Math.min(6, th.article_count)}件）</div>
+            ${recHtml}
+            ${th.article_count > 6 ? `
+            <div style="text-align:center;margin-top:24px;">
+              <a href="articles.html" class="btn btn-outline btn-sm" style="font-size:.84rem;">
+                このテーマの全記事を記事一覧で見る →
+              </a>
+            </div>` : ''}
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <!-- テーマ情報 -->
+          <div class="th-sidebar-card" style="background:${th.color};border-color:${th.accent}33;">
+            <div class="th-sidebar-title" style="color:${th.accent};">テーマ情報</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+              <span style="font-size:2.5rem;">${th.icon}</span>
+              <div>
+                <div style="font-family:var(--font-serif);font-size:1.1rem;color:var(--ink-900);">${th.name}</div>
+                <div style="font-size:.76rem;color:var(--ink-400);margin-top:3px;">CSR大分類</div>
+              </div>
+            </div>
+            ${th.avg_score > 0 ? `
+            <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+              <span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:${avgColor};">${avgRank}</span>
+              <div style="flex:1;">
+                <div class="th-score-bar"><div class="th-score-fill" style="width:${Math.round((th.avg_score/25)*100)}%;background:${avgColor};"></div></div>
+                <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--ink-400);margin-top:2px;">平均 ${th.avg_score}/25点</div>
+              </div>
+            </div>` : ''}
+          </div>
+
+          <!-- 関連企業 -->
+          ${coHtml ? `
+          <div class="th-sidebar-card">
+            <div class="th-sidebar-title">関連企業（${th.companies.length}社）</div>
+            ${coHtml}
+          </div>` : ''}
+
+          <!-- 活動頻度 -->
+          ${th.article_count > 0 ? `
+          <div class="th-sidebar-card">
+            <div class="th-sidebar-title">最近の活動頻度（月別）</div>
+            ${actHtml}
+          </div>` : ''}
+
+          <!-- 分類タグ -->
+          ${tagHtml ? `
+          <div class="th-sidebar-card">
+            <div class="th-sidebar-title">関連キーワード</div>
+            <div class="tag-list">${tagHtml}</div>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  initScrollAnimations();
+})();
+</script>
+</body>
+</html>
