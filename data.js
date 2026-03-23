@@ -77,7 +77,7 @@ function renderCard(article) {
       </div>
       <div class="card-body">
         <div class="card-meta">
-          <span class="tag tag-company">${name}</span>
+          <a href="company.html?name=${encodeURIComponent(name)}" class="tag tag-company" onclick="event.preventDefault();event.stopPropagation();location.href=this.href;">${name}</a>
           <span class="tag tag-industry">${industry}</span>
           ${relLabel ? `<span class="tag" style="background:rgba(0,0,0,0.05);color:${relLabel.color};font-size:0.68rem;">${relLabel.label}</span>` : ''}
         </div>
@@ -147,7 +147,7 @@ function renderFooter() {
             <p class="footer-desc">国内上場企業のCSR・サステナビリティ・社会貢献活動を収集・整理・可視化する情報プラットフォーム。</p>
           </div>
           <div>
-            <div class="footer-col-title">コンテンツ</div>
+            <div class="footer-col-title">コンヵンツ</div>
             <div class="footer-links">
               <a href="articles.html">記事一覧</a>
               <a href="companies.html">企業別</a>
@@ -159,7 +159,7 @@ function renderFooter() {
             <div class="footer-links">
               <a href="about.html">About</a>
               <a href="#">お問い合わせ</a>
-              <a href="#">プライバシーポリシー</a>
+              <a href="#">プライヂシーポリシー</a>
             </div>
           </div>
           <div>
