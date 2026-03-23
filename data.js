@@ -82,7 +82,7 @@ function renderCard(article) {
           ${relLabel ? `<span class="tag" style="background:rgba(0,0,0,0.05);color:${relLabel.color};font-size:0.68rem;">${relLabel.label}</span>` : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
-          <span class="tag tag-theme" style="background:${csrMeta.color||'#d8f3dc'};color:${csrMeta.accent||'#2d6a4f'};">
+          <span class="tag tag-theme" style="background:${csrMeta.color||'#d8f3dc'};color:${csrMeta.accent||'#2d6a4f'};" onclick="event.preventDefault();event.stopPropagation();location.href='theme.html?name='+encodeURIComponent('${article.csr_type||''}');cursor:pointer;">
             ${csrMeta.icon||''} ${article.csr_type||''}
           </span>
           ${article.csr_subtype ? `<span class="tag" style="background:var(--cream);color:var(--ink-500);font-size:0.68rem;">${article.csr_subtype}</span>` : ''}
@@ -147,7 +147,7 @@ function renderFooter() {
             <p class="footer-desc">国内上場企業のCSR・サステナビリティ・社会貢献活動を収集・整理・可視化する情報プラットフォーム。</p>
           </div>
           <div>
-            <div class="footer-col-title">コンヵンツ</div>
+            <div class="footer-col-title">コンテンツ</div>
             <div class="footer-links">
               <a href="articles.html">記事一覧</a>
               <a href="companies.html">企業別</a>
@@ -159,7 +159,7 @@ function renderFooter() {
             <div class="footer-links">
               <a href="about.html">About</a>
               <a href="#">お問い合わせ</a>
-              <a href="#">プライヂシーポリシー</a>
+              <a href="#">プライバシーポリシー</a>
             </div>
           </div>
           <div>
