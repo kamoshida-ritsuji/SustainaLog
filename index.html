@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SustainaLog — 国内企業のCSR・サステナビリティ情報プラットフォーム</title>
+  <meta name="description" content="国内上場企業のCSR・サステナビリティ・社会貢献活動を収集・整理・可視化する情報プラットフォーム。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg-decor">
+    <div class="hero-circle" style="width:600px;height:600px;top:-200px;right:-100px;"></div>
+    <div class="hero-circle" style="width:300px;height:300px;bottom:-80px;left:5%;"></div>
+  </div>
+  <div class="container" style="position:relative;z-index:1;">
+    <p class="hero-label">CSR &amp; Sustainability Intelligence</p>
+    <h1>日本企業の<em>サステナビリティ</em>活動を、<br>ひとつの場所で。</h1>
+    <p class="hero-desc">国内上場企業のCSR・環境・社会貢献活動をAIが収集・整理・解説。
+    投資家・研究者・ビジネスパーソンのための信頼できる情報プラットフォームです。</p>
+    <div class="hero-actions">
+      <a href="articles.html" class="btn btn-primary">記事を探す →</a>
+      <a href="about.html" class="btn" style="color:var(--green-200);border:2px solid rgba(255,255,255,0.25);padding:12px 24px;border-radius:4px;font-weight:700;font-size:0.9rem;transition:background 0.22s;">サイトについて</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">248</div>
+        <div class="stat-label">収録記事数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">87</div>
+        <div class="stat-label">掲載企業数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">18</div>
+        <div class="stat-label">テーマカテゴリ</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">毎日</div>
+        <div class="stat-label">情報更新</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURED ARTICLE ─── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-label">注目の記事</p>
+        <h2 class="section-title">今週のピックアップ</h2>
+      </div>
+      <a href="articles.html" class="view-all">すべての記事を見る →</a>
+    </div>
+    <div id="featured-mount"></div>
+  </div>
+</section>
+
+<!-- ─── LATEST ARTICLES ─── -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Latest Articles</p>
+        <h2 class="section-title">最新の活動情報</h2>
+      </div>
+      <a href="articles.html" class="view-all">もっと見る →</a>
+    </div>
+    <div class="articles-grid" id="latest-mount"></div>
+  </div>
+</section>
+
+<!-- ─── THEMES ─── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Themes</p>
+        <h2 class="section-title">テーマから探す</h2>
+      </div>
+      <a href="themes.html" class="view-all">テーマ一覧 →</a>
+    </div>
+    <div class="themes-grid" id="themes-mount"></div>
+  </div>
+</section>
+
+<!-- ─── COMPANIES ─── -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-label">Companies</p>
+        <h2 class="section-title">企業から探す</h2>
+      </div>
+      <a href="companies.html" class="view-all">企業一覧 →</a>
+    </div>
+    <div class="companies-grid" id="companies-mount"></div>
+  </div>
+</section>
+
+<!-- ─── CTA BANNER ─── -->
+<section class="section" style="background:var(--green-800);padding:72px 0;">
+  <div class="container" style="text-align:center;">
+    <p style="font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-400);margin-bottom:12px;">Stay Updated</p>
+    <h2 style="font-family:var(--font-serif);font-size:clamp(1.6rem,4vw,2.4rem);color:var(--cream);margin-bottom:16px;">最新のサステナビリティ情報を見逃さない</h2>
+    <p style="color:var(--green-200);margin-bottom:32px;font-size:0.95rem;">記事の更新情報・企業別レポートを定期的にお届けします（準備中）</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="articles.html" class="btn btn-primary">記事一覧を見る</a>
+      <a href="about.html" class="btn" style="color:var(--green-200);border:2px solid rgba(255,255,255,0.2);padding:12px 24px;border-radius:4px;font-weight:700;font-size:0.9rem;">詳細を見る</a>
+    </div>
+  </div>
+</section>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('index.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+// Featured
+const featured = ARTICLES.find(a => a.featured);
+if (featured) {
+  document.getElementById('featured-mount').innerHTML = `
+    <a href="article.html?slug=${featured.slug}" class="featured-card">
+      <div class="featured-img">
+        <span style="font-size:5rem;opacity:0.7">🌱</span>
+      </div>
+      <div class="featured-body">
+        <p class="featured-eyebrow">${featured.company} · ${featured.industry}</p>
+        <h2 class="featured-title">${featured.title}</h2>
+        <p class="featured-summary">${featured.summary.substring(0,120)}…</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+          ${featured.themes.map(t=>`<span class="tag tag-theme">${t}</span>`).join('')}
+        </div>
+        <span class="btn btn-outline btn-sm">記事を読む →</span>
+      </div>
+    </a>
+  `;
+}
+
+// Latest (skip featured)
+const latest = ARTICLES.filter(a => !a.featured).slice(0,6);
+document.getElementById('latest-mount').innerHTML = latest.map(renderCard).join('');
+
+// Themes
+document.getElementById('themes-mount').innerHTML = THEMES.map(t => `
+  <a href="themes.html" class="theme-tile">
+    <div class="theme-icon" style="background:${t.color};color:${t.accent}">${t.icon}</div>
+    <div>
+      <div class="theme-name">${t.name}</div>
+      <div class="theme-count">${t.count}件の記事</div>
+    </div>
+  </a>
+`).join('');
+
+// Companies
+document.getElementById('companies-mount').innerHTML = COMPANIES.map(c => `
+  <a href="companies.html" class="company-card">
+    <div class="company-logo-placeholder">${c.icon}</div>
+    <div class="company-card-name">${c.name}</div>
+    <div class="company-card-industry">${c.industry}</div>
+    <div class="company-card-count">${c.count}件の記事</div>
+  </a>
+`).join('');
+
+initScrollAnimations();
+</script>
+</body>
+</html>
