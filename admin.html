@@ -430,13 +430,26 @@ function getStatus(articleId) {
     || ARTICLE_STATUS.PENDING_REVIEW;
 }
 
-// ステータス更新
-// Phase 2: updateStatusInSheets() を呼ぶだけで書き込みも可能
+// 処理中フラグ（二重送信防止）
+const processingIds = new Set();
+
+// ステータス更新（Sheets書き込み対応）
 async function updateArticleStatus(articleId, newStatus) {
+  // ① ローカルstateを先に更新（UIを即時反映）
+  const prevStatus = getStatus(articleId);
   localState.set(articleId, newStatus);
-  // Phase 2 で以下のコメントを外す:
-  // const result = await updateStatusInSheets(articleId, newStatus);
-  // if (!result.success) showToast('⚠️', '更新に失敗しました: ' + result.error);
+  refreshAll();
+
+  // ② Google Sheets に書き込み（GAS Webhook）
+  if (typeof updateStatusInSheets === 'function' && isWriteEnabled()) {
+    const result = await updateStatusInSheets(articleId, newStatus);
+    if (!result.success) {
+      // 失敗時: ローカルstateをロールバック
+      localState.set(articleId, prevStatus);
+      refreshAll();
+      throw new Error(result.error || 'Sheets更新に失敗しました');
+    }
+  }
 }
 
 // ============================================================
@@ -492,10 +505,14 @@ function renderBanner() {
   const el = document.getElementById('data-source-banner');
 
   if (dataSource === 'sheets') {
+    const writeStatus = (typeof isWriteEnabled === 'function' && isWriteEnabled())
+      ? '<span style="margin-left:12px;padding:2px 8px;border-radius:99px;background:#d8f3dc;color:#2d6a4f;font-size:.7rem;font-weight:700;">✏️ 書き込み有効</span>'
+      : '<span style="margin-left:12px;padding:2px 8px;border-radius:99px;background:#fef9ef;color:#c9a84c;font-size:.7rem;font-weight:700;">👁 読み取り専用</span>';
     el.innerHTML = `
       <div class="data-source-banner banner-sheets">
         <div class="banner-dot" style="background:#2d6a4f;"></div>
         ✅ Google Sheets からリアルタイムデータを読み込んでいます（${articleStore.length}件）
+        ${writeStatus}
       </div>`;
   } else if (dataSource === 'fallback' && dataError) {
     el.innerHTML = `
@@ -655,22 +672,73 @@ function renderCurrentTab() {
 }
 
 // ============================================================
-// Status Actions
+// Status Actions（Sheets書き込み＋ローディング＋エラー対応）
 // ============================================================
 async function handleApprove(id) {
-  await updateArticleStatus(id, ARTICLE_STATUS.PUBLISHED);
-  showToast('✅', '記事を承認・公開しました');
-  refreshAll(); closeModal();
+  if (processingIds.has(id)) return;
+  processingIds.add(id);
+  setButtonsDisabled(id, true);
+  showToast('⏳', 'Sheetsに保存中...');
+  try {
+    await updateArticleStatus(id, ARTICLE_STATUS.PUBLISHED);
+    const writeMode = isWriteEnabled() ? 'Sheetsに保存しました ✅' : '承認しました（ローカルのみ）';
+    showToast('✅', `記事を公開しました。${writeMode}`);
+    closeModal();
+  } catch (err) {
+    showToast('❌', '承認に失敗しました: ' + err.message);
+  } finally {
+    processingIds.delete(id);
+    setButtonsDisabled(id, false);
+  }
 }
+
 async function handleReject(id) {
-  await updateArticleStatus(id, ARTICLE_STATUS.REJECTED);
-  showToast('❌', '記事を却下しました');
-  refreshAll(); closeModal();
+  if (processingIds.has(id)) return;
+  processingIds.add(id);
+  setButtonsDisabled(id, true);
+  showToast('⏳', 'Sheetsに保存中...');
+  try {
+    await updateArticleStatus(id, ARTICLE_STATUS.REJECTED);
+    const writeMode = isWriteEnabled() ? 'Sheetsに保存しました ✅' : '却下しました（ローカルのみ）';
+    showToast('❌', `記事を却下しました。${writeMode}`);
+    closeModal();
+  } catch (err) {
+    showToast('❌', '却下に失敗しました: ' + err.message);
+  } finally {
+    processingIds.delete(id);
+    setButtonsDisabled(id, false);
+  }
 }
+
 async function handleRevert(id) {
-  await updateArticleStatus(id, ARTICLE_STATUS.PENDING_REVIEW);
-  showToast('↩', 'レビュー待ちに戻しました');
-  refreshAll(); closeModal();
+  if (processingIds.has(id)) return;
+  processingIds.add(id);
+  setButtonsDisabled(id, true);
+  showToast('⏳', 'Sheetsに保存中...');
+  try {
+    await updateArticleStatus(id, ARTICLE_STATUS.PENDING_REVIEW);
+    const writeMode = isWriteEnabled() ? 'Sheetsに保存しました ✅' : '差し戻しました（ローカルのみ）';
+    showToast('↩', `レビュー待ちに戻しました。${writeMode}`);
+    closeModal();
+  } catch (err) {
+    showToast('❌', '差し戻しに失敗しました: ' + err.message);
+  } finally {
+    processingIds.delete(id);
+    setButtonsDisabled(id, false);
+  }
+}
+
+// ボタンの有効/無効を切り替え（二重クリック防止）
+function setButtonsDisabled(articleId, disabled) {
+  document.querySelectorAll(
+    `[onclick*="handleApprove('${articleId}')"],
+     [onclick*="handleReject('${articleId}')"],
+     [onclick*="handleRevert('${articleId}')"]`
+  ).forEach(btn => {
+    btn.disabled = disabled;
+    btn.style.opacity = disabled ? '0.5' : '1';
+    btn.style.cursor = disabled ? 'not-allowed' : 'pointer';
+  });
 }
 
 function refreshAll() {
@@ -793,9 +861,11 @@ function openModal(articleId) {
       <div class="modal-footer-status">
         <span>現在:</span>
         <span style="font-weight:700;padding:3px 10px;border-radius:99px;background:${stMeta.bg};color:${stMeta.color};">${stMeta.label}</span>
-        ${dataSource === 'sheets'
-          ? '<span style="font-size:.72rem;color:var(--green-600);margin-left:4px;">● Sheets連携中</span>'
-          : '<span style="font-size:.72rem;color:#c9a84c;margin-left:4px;">○ ローカルのみ</span>'}
+        ${dataSource === 'sheets' && (typeof isWriteEnabled === 'function' && isWriteEnabled())
+          ? '<span style="font-size:.72rem;color:var(--green-600);margin-left:6px;">✏️ Sheets書き込み有効</span>'
+          : dataSource === 'sheets'
+            ? '<span style="font-size:.72rem;color:#c9a84c;margin-left:6px;">👁 読み取り専用（GAS未設定）</span>'
+            : '<span style="font-size:.72rem;color:#c9a84c;margin-left:6px;">○ ローカルのみ</span>'}
       </div>
       <div class="modal-footer-actions">
         ${isPending  ? `
