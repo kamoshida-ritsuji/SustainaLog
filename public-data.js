@@ -66,30 +66,55 @@ function getArticleBySlug(s) { return getPublicArticleBySlug(s); }
 function getCompanySummaries() {
   const articles = getPublicArticles();
   if (articles.length === 0) {
-    if (typeof COMPANY_MASTER !== 'undefined')
-      return COMPANY_MASTER.map(c => ({...c,article_count:0,avg_score:0,themes:[],latest_date:null,articles:[]}));
+    if (typeof COMPANY_MASTER !== 'undefined') {
+      return COMPANY_MASTER.map(c => ({ ...c, article_count: 0, avg_score: 0, themes: [], latest_date: null, articles: [] }));
+    }
     return [];
   }
   const map = {};
   articles.forEach(a => {
-    const key = a.company_name; if (!key) return;
+    const key = a.company_name;
+    if (!key) return;
     if (!map[key]) {
-      const m = typeof COMPANY_MASTER !== 'undefined'
-        ? COMPANY_MASTER.find(c => c.company_name===key||(c.aliases&&c.aliases.includes(key))) : null;
-      map[key] = {company_name:key,ticker:a.ticker||(m&&m.ticker)||null,market:a.market||(m&&m.market)||null,industry:a.industry||(m&&m.industry)||'',icon:(m&&m.icon)||'🏢',official_url:(m&&m.official_url)||null,sustainability_url:(m&&m.sustainability_url)||null,ir_url:(m&&m.ir_url)||null,articles:[],scores:[],theme_count:{}};
+      const master = (typeof COMPANY_MASTER !== 'undefined')
+        ? COMPANY_MASTER.find(c => c.company_name === key || (c.aliases && c.aliases.includes(key)))
+        : null;
+      map[key] = {
+        company_name: key,
+        ticker:       a.ticker || (master && master.ticker) || null,
+        market:       a.market || (master && master.market) || null,
+        industry:     a.industry || (master && master.industry) || '',
+        icon:         (master && master.icon) || '🏢',
+        official_url: (master && master.official_url) || null,
+        sustainability_url: (master && master.sustainability_url) || null,
+        ir_url:       (master && master.ir_url) || null,
+        articles:     [],
+        scores:       [],
+        theme_count:  {},
+      };
     }
     map[key].articles.push(a);
-    if (a.total_score) map[key].scores.push(Number(a.total_score)||0);
-    const t = a.csr_type; if (t) map[key].theme_count[t] = (map[key].theme_count[t]||0)+1;
+    if (a.total_score) map[key].scores.push(Number(a.total_score) || 0);
+    const theme = a.csr_type;
+    if (theme) map[key].theme_count[theme] = (map[key].theme_count[theme] || 0) + 1;
   });
   return Object.values(map).map(c => {
-    const sorted=c.articles.slice().sort((a,b)=>(b.published_at||b.fetched_at||'')>(a.published_at||a.fetched_at||'')?1:-1);
-    const avg=c.scores.length?Math.round(c.scores.reduce((s,v)=>s+v,0)/c.scores.length):0;
-    const themes=Object.entries(c.theme_count).sort((a,b)=>b[1]-a[1]).slice(0,4).map(e=>e[0]);
-    const latest=sorted[0]?(sorted[0].published_at||sorted[0].fetched_at||null):null;
-    return {company_name:c.company_name,ticker:c.ticker,industry:c.industry,market:c.market,icon:c.icon,official_url:c.official_url,sustainability_url:c.sustainability_url,ir_url:c.ir_url,article_count:c.articles.length,avg_score:avg,themes:themes,latest_date:latest,articles:sorted};
-  }).sort((a,b)=>b.article_count-a.article_count);
+    const sorted = c.articles.slice().sort((a, b) => {
+      return (b.published_at || b.fetched_at || '') > (a.published_at || a.fetched_at || '') ? 1 : -1;
+    });
+    const avg = c.scores.length ? Math.round(c.scores.reduce((s, v) => s + v, 0) / c.scores.length) : 0;
+    const themes = Object.entries(c.theme_count).sort((a, b) => b[1] - a[1]).slice(0, 4).map(e => e[0]);
+    const latest = sorted[0] ? (sorted[0].published_at || sorted[0].fetched_at || null) : null;
+    return {
+      company_name: c.company_name, ticker: c.ticker, market: c.market,
+      industry: c.industry, icon: c.icon, official_url: c.official_url,
+      sustainability_url: c.sustainability_url, ir_url: c.ir_url,
+      article_count: c.articles.length, avg_score: avg,
+      themes: themes, latest_date: latest, articles: sorted,
+    };
+  }).sort((a, b) => b.article_count - a.article_count);
 }
+
 function getCompanySummaryByName(n) { return getCompanySummaries().find(c=>c.company_name===n)||null; }
 function getCompanySummariesByIndustry(i) { return getCompanySummaries().filter(c=>c.industry===i); }
 
