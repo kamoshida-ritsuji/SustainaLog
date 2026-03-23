@@ -106,6 +106,7 @@ function renderHeader(activePage = '') {
     { href: 'articles.html',  label: '記事一覧' },
     { href: 'companies.html', label: '企業別' },
     { href: 'themes.html',    label: 'テーマ別' },
+    { href: 'dashboard.html', label: '分析' },
     { href: 'about.html',     label: 'About' },
   ];
   const navHtml = pages.map(p =>
