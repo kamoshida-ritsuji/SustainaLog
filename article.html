@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>記事詳細 — SustainaLog</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .share-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--ink-100);
+    }
+    .share-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--ink-100);
+      color: var(--ink-500);
+      background: var(--white);
+      transition: all var(--transition);
+    }
+    .share-btn:hover { border-color: var(--green-400); color: var(--green-700); }
+    .related-section { margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--ink-100); }
+    .related-title {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      color: var(--ink-900);
+      margin-bottom: 24px;
+    }
+    .related-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    @media(max-width:768px) { .related-grid { grid-template-columns: 1fr; } }
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--ink-100);
+      font-size: 0.84rem;
+    }
+    .data-row:last-child { border-bottom: none; }
+    .data-label { color: var(--ink-300); font-weight: 600; }
+    .data-value { color: var(--ink-700); text-align: right; }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      color: var(--green-600);
+      margin-bottom: 24px;
+      transition: gap var(--transition);
+    }
+    .back-link:hover { gap: 10px; }
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+<div id="article-mount"></div>
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('articles.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+const params = new URLSearchParams(window.location.search);
+const slug = params.get('slug');
+const article = getArticleBySlug(slug);
+
+if (!article) {
+  document.getElementById('article-mount').innerHTML = `
+    <div class="container" style="padding:80px 24px;text-align:center;">
+      <p style="font-size:3rem;margin-bottom:16px;">🌿</p>
+      <h2 style="font-family:var(--font-serif);margin-bottom:12px;">記事が見つかりませんでした</h2>
+      <p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いただくか、記事一覧からお探しください。</p>
+      <a href="articles.html" class="btn btn-primary">記事一覧へ</a>
+    </div>
+  `;
+} else {
+  // Update page title
+  document.title = `${article.title} — SustainaLog`;
+
+  // Related articles (same theme, different slug)
+  const related = ARTICLES
+    .filter(a => a.slug !== article.slug && a.themes.some(t => article.themes.includes(t)))
+    .slice(0, 3);
+
+  const relatedHtml = related.length > 0 ? `
+    <div class="related-section">
+      <h2 class="related-title">関連記事</h2>
+      <div class="related-grid">
+        ${related.map(renderCard).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  document.getElementById('article-mount').innerHTML = `
+    <div style="background:var(--green-900);padding:40px 0 0;">
+      <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb" style="color:var(--green-400);">
+          <a href="index.html" style="color:var(--green-300);">ホーム</a>
+          <span class="breadcrumb-sep">/</span>
+          <a href="articles.html" style="color:var(--green-300);">記事一覧</a>
+          <span class="breadcrumb-sep">/</span>
+          <span style="color:var(--green-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;">${article.title}</span>
+        </div>
+        <!-- Article header on dark bg -->
+        <div style="padding-bottom:40px;">
+          <div class="article-tags">
+            ${article.themes.map(t=>`<span class="tag tag-theme">${t}</span>`).join('')}
+            <span class="tag tag-industry">${article.industry}</span>
+          </div>
+          <h1 class="article-title" style="color:var(--cream);margin-top:12px;">${article.title}</h1>
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:16px;">
+            <span class="byline-company" style="color:var(--green-300);">${article.company}</span>
+            <span class="byline-date">${formatDate(article.publishedAt)}</span>
+            <span style="font-size:0.8rem;color:var(--green-400);">引用元: ${article.sourceName}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="article-layout">
+        <!-- Main Content -->
+        <main>
+          <a href="articles.html" class="back-link">← 記事一覧に戻る</a>
+
+          <!-- Summary Block -->
+          <div class="article-summary-block">
+            <h3>活動の概要</h3>
+            <p>${article.summary}</p>
+          </div>
+
+          <!-- AI Commentary -->
+          <div class="ai-block">
+            <div class="ai-block-header">
+              <span class="ai-badge">AI ANALYSIS</span>
+              <h3>AIによる解説・評価</h3>
+            </div>
+            <p>${article.aiComment}</p>
+          </div>
+
+          <!-- Source Link -->
+          <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px;">
+            <h3 style="font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-300);margin-bottom:12px;">引用元</h3>
+            <a href="${article.sourceUrl}" target="_blank" rel="noopener noreferrer" class="source-link">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              ${article.sourceName}
+              <span style="font-size:0.72rem;color:var(--ink-200);">↗</span>
+            </a>
+            <p style="font-size:0.78rem;color:var(--ink-300);margin-top:8px;">${article.sourceUrl}</p>
+          </div>
+
+          <!-- Share -->
+          <div class="share-bar">
+            <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);this.textContent='✓ コピーしました'">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              URLをコピー
+            </button>
+            <button class="share-btn">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              シェア
+            </button>
+          </div>
+
+          ${relatedHtml}
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="article-sidebar">
+          <!-- Company Info -->
+          <div class="sidebar-card">
+            <div class="sidebar-title">企業情報</div>
+            <div class="company-name-big">${article.company}</div>
+            <div class="company-industry">${article.industry}</div>
+            <div class="company-stock">上場企業</div>
+            <div class="data-row">
+              <span class="data-label">業界</span>
+              <span class="data-value">${article.industry}</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">活動テーマ数</span>
+              <span class="data-value">${article.themes.length}テーマ</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">公開日</span>
+              <span class="data-value">${formatDate(article.publishedAt)}</span>
+            </div>
+            <div style="margin-top:16px;">
+              <a href="companies.html" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">この企業の記事を見る</a>
+            </div>
+          </div>
+
+          <!-- Theme Tags -->
+          <div class="sidebar-card">
+            <div class="sidebar-title">テーマタグ</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              ${article.themes.map(t=>`
+                <a href="themes.html" class="tag tag-theme" style="cursor:pointer;transition:background 0.2s;">
+                  ${t}
+                </a>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Related themes CTA -->
+          <div class="sidebar-card" style="background:var(--green-50);border-color:var(--green-200);">
+            <div class="sidebar-title" style="color:var(--green-600);">このテーマをもっと見る</div>
+            <p style="font-size:0.84rem;color:var(--ink-500);line-height:1.6;margin-bottom:16px;">「${article.themes[0]}」に関連する最新の企業活動情報を一覧で確認できます。</p>
+            <a href="themes.html" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">テーマ一覧へ</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  `;
+
+  initScrollAnimations();
+}
+</script>
+</body>
+</html>
