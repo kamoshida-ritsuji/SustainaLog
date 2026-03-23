@@ -6,6 +6,7 @@
   <title>記事詳細 — SustainaLog</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
     .share-bar{display:flex;gap:10px;margin-top:32px;padding-top:24px;border-top:1px solid var(--ink-100);flex-wrap:wrap;}
     .share-btn{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;padding:8px 16px;border-radius:var(--radius-sm);border:1.5px solid var(--ink-100);color:var(--ink-500);background:var(--white);transition:all var(--transition);cursor:pointer;}
     .share-btn:hover{border-color:var(--green-400);color:var(--green-700);}
@@ -30,188 +31,97 @@
     .classification-tag{font-size:.72rem;color:var(--ink-500);background:var(--cream);padding:3px 10px;border-radius:99px;border:1px solid var(--ink-100);}
     .url-link{color:var(--green-600);font-size:.8rem;display:inline-flex;align-items:center;gap:4px;word-break:break-all;}
     .url-link:hover{text-decoration:underline;}
+    .source-highlight{background:var(--green-50);border:1.5px solid var(--green-200);border-radius:var(--radius-md);padding:16px 20px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+    .source-highlight-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px;}
+    .source-highlight-body{flex:1;min-width:0;}
+    .source-highlight-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green-600);margin-bottom:4px;}
+    .source-highlight-link{font-size:.84rem;color:var(--green-700);font-weight:600;word-break:break-all;}
+    .source-highlight-link:hover{text-decoration:underline;}
+    .source-highlight-name{font-size:.76rem;color:var(--green-500);margin-top:2px;}
   </style>
 </head>
 <body>
 <div id="header-mount"></div>
-<div id="article-mount"></div>
+<div id="article-mount">
+  <div style="text-align:center;padding:96px 24px;">
+    <div style="width:40px;height:40px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px;"></div>
+    <p style="color:var(--ink-300);font-size:.9rem;">記事を読み込み中...</p>
+  </div>
+</div>
 <div id="footer-mount"></div>
+
 <script src="schema.js"></script>
 <script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
+<script src="public-data.js"></script>
 <script src="data.js"></script>
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('articles.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
 
-const params  = new URLSearchParams(window.location.search);
-const slug    = params.get('slug');
-const article = getArticleBySlug(slug);
+const params = new URLSearchParams(window.location.search);
+const slug   = params.get('slug');
 
-if (!article) {
-  document.getElementById('article-mount').innerHTML = `
-    <div class="container" style="padding:80px 24px;text-align:center;">
-      <p style="font-size:3rem;margin-bottom:16px;">🌿</p>
-      <h2 style="font-family:var(--font-serif);margin-bottom:12px;">記事が見つかりませんでした</h2>
-      <p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いただくか、記事一覧からお探しください。</p>
-      <a href="articles.html" class="btn btn-primary">記事一覧へ</a>
-    </div>`;
-} else {
+(async () => {
+  await loadPublicArticles();
+  const article = getPublicArticleBySlug(slug);
+  const mount   = document.getElementById('article-mount');
+
+  if (!article) {
+    mount.innerHTML = `
+      <div class="container" style="padding:80px 24px;text-align:center;">
+        <p style="font-size:3rem;margin-bottom:16px;">🌿</p>
+        <h2 style="font-family:var(--font-serif);margin-bottom:12px;">記事が見つかりませんでした</h2>
+        <p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いただくか、記事一覧からお探しください。</p>
+        <a href="articles.html" class="btn btn-primary">記事一覧へ</a>
+      </div>`;
+    return;
+  }
+
   document.title = article.translated_title + ' — SustainaLog';
-  const related = getPublishedArticles()
-    .filter(a => a.slug !== article.slug && a.csr_type === article.csr_type)
-    .slice(0,3).map(adaptArticleForUI);
-  const relatedHtml = related.length > 0 ? `
-    <div class="related-section">
-      <h2 class="related-title">同じテーマの記事</h2>
-      <div class="related-grid">${related.map(renderCard).join('')}</div>
-    </div>` : '';
-
   const csrMeta  = CSR_TYPE_META[article.csr_type] || {};
   const relLabel = RELATION_TYPE_LABEL[article.relation_type] || null;
   const rank     = scoreToRank(article.total_score || 0);
   const company  = getCompanyByName(article.company_name) || {};
-
-  const scoreRows = SCORE_DEFINITION.map(def => {
-    const val = Number(article[def.key]) || 0;
-    const pct = Math.round((val / def.max) * 100);
-    return `<tr>
-      <td class="score-label-cell">
-        <div style="font-weight:600;color:var(--ink-700);font-size:.82rem;">${def.label}</div>
-        <div style="font-size:.72rem;color:var(--ink-300);margin-top:2px;">${def.desc}</div>
-      </td>
-      <td class="score-bar-cell">
-        <div class="score-mini-bar"><div class="score-mini-fill" style="width:${pct}%;"></div></div>
-      </td>
-      <td class="score-num-cell">${val}/${def.max}</td>
-    </tr>`;
-  }).join('');
-
-  const tagsHtml = (article.classification_tags||[])
-    .map(t=>`<span class="classification-tag">${t}</span>`).join('');
-
-  const linkRows = [
-    {label:'引用元記事',          url:article.source_url,         name:article.source_name},
-    {label:'公式サイト',          url:article.official_url||(company&&company.official_url),    name:'企業公式サイト'},
-    {label:'サステナビリティ',     url:article.sustainability_url||(company&&company.sustainability_url), name:'サステナビリティ情報'},
-    {label:'IR情報',              url:article.ir_url||(company&&company.ir_url),               name:'投資家向け情報'},
-  ].filter(l=>l.url).map(l=>`
-    <div class="data-row">
-      <span class="data-label">${l.label}</span>
-      <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="url-link">${l.name} <span style="opacity:.5;">↗</span></a>
-    </div>`).join('');
-
-  document.getElementById('article-mount').innerHTML = `
-    <div style="background:var(--green-900);padding:40px 0 0;">
-      <div class="container">
-        <div class="breadcrumb" style="color:var(--green-400);">
-          <a href="index.html" style="color:var(--green-300);">ホーム</a>
-          <span class="breadcrumb-sep">/</span>
-          <a href="articles.html" style="color:var(--green-300);">記事一覧</a>
-          <span class="breadcrumb-sep">/</span>
-          <span style="color:var(--green-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;">${article.translated_title}</span>
-        </div>
-        <div style="padding-bottom:40px;">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-            <span class="tag" style="background:${csrMeta.color||'#d8f3dc'};color:${csrMeta.accent||'#2d6a4f'};">${csrMeta.icon||''} ${article.csr_type}</span>
-            ${article.csr_subtype?`<span class="tag tag-industry">${article.csr_subtype}</span>`:''}
-            ${relLabel?`<span class="tag" style="background:rgba(255,255,255,.1);color:${relLabel.color};">${relLabel.label}</span>`:''}
-            ${renderStatusBadge(article.status)}
-          </div>
-          <h1 style="font-family:var(--font-serif);font-size:clamp(1.4rem,3.5vw,2.2rem);color:var(--cream);line-height:1.25;margin-bottom:16px;">${article.translated_title}</h1>
-          ${article.source_title!==article.translated_title?`<p style="font-size:.8rem;color:var(--green-400);margin-bottom:12px;">原題: ${article.source_title}</p>`:''}
-          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-            <span style="font-weight:700;color:var(--green-300);font-size:.9rem;">${article.company_name}</span>
-            <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--green-400);">${article.ticker?article.ticker+' / ':''}${MARKET_LABEL[article.market]||article.market}</span>
-            <span style="font-family:var(--font-mono);font-size:.75rem;color:var(--green-400);">${formatDate(article.published_at)}</span>
-            <span style="font-size:.78rem;color:var(--green-400);">引用元: ${article.source_name}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="article-layout">
-        <main>
-          <a href="articles.html" class="back-link">← 記事一覧に戻る</a>
-          <div class="article-summary-block">
-            <h3>活動の概要</h3>
-            <p>${article.summary}</p>
-          </div>
-          <div class="ai-block">
-            <div class="ai-block-header">
-              <span class="ai-badge">AI ANALYSIS</span>
-              <h3>AIによる解説・評価</h3>
-            </div>
-            <p>${article.ai_commentary}</p>
-          </div>
-          <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-lg);padding:28px;margin-bottom:32px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-              <h3 style="font-family:var(--font-serif);font-size:1.05rem;color:var(--ink-900);">評価スコア詳細</h3>
-              <div style="display:flex;align-items:center;gap:10px;">
-                <span style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:${rank.color};">${rank.label}</span>
-                <span style="font-family:var(--font-mono);font-size:.9rem;color:var(--ink-300);">${article.total_score}/${SCORE_MAX_TOTAL}点</span>
-              </div>
-            </div>
-            <table class="score-detail">${scoreRows}</table>
-          </div>
-          ${tagsHtml?`<div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px;">
-            <h3 style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-300);margin-bottom:12px;">分類タグ</h3>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">${tagsHtml}</div>
-          </div>`:''}
-          <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px;">
-            <h3 style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-300);margin-bottom:16px;">引用元・関連リンク</h3>
-            ${linkRows}
-          </div>
-          <div class="share-bar">
-            <button class="share-btn" onclick="navigator.clipboard.writeText(location.href);this.textContent='✓ コピーしました'">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              URLをコピー
-            </button>
+  const related = getPublicArticles().filter(a => a.slug !== article.slug && a.csr_type === article.csr_type).slice(0,3).map(adaptArticleForUI);
+  const relatedHtml = related.length > 0 ? `<div class="related-section"><h2 class="related-title">同じテーマの記事</h2><div class="related-grid">${related.map(renderCard).join('')}</div></div>` : '';
+  const scoreRows = SCORE_DEFINITION.map(def => { const val = Number(article[def.key]) || 0; const pct = Math.round((val/def.max)*100); return `<tr><td class="score-label-cell"><div style="font-weight:600;color:var(--ink-700);font-size:.82rem;">${def.label}</div><div style="font-size:.72rem;color:var(--ink-300);margin-top:2px;">${def.desc}</div></td><td class="score-bar-cell"><div class="score-mini-bar"><div class="score-mini-fill" style="width:${pct}%;"></div></div></td><td class="score-num-cell">${val}/${def.max}</td></tr>`; }).join('');
+  const tags = Array.isArray(article.classification_tags) ? article.classification_tags : (article.classification_tags||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const tagsHtml = tags.map(t=>`<span class="classification-tag">${t}</span>`).join('');
+  const sourceHighlightHtml = article.source_url ? `<div class="source-highlight"><div class="source-highlight-icon">📄</div><div class="source-highlight-body"><div class="source-highlight-label">引用元記事</div><a href="${article.source_url}" target="_blank" rel="noopener noreferrer" class="source-highlight-link">${article.source_title||article.translated_title} ↗</a>${article.source_name?`<div class="source-highlight-name">${article.source_name}</div>`:''}</div></div>` : '';
+  const subLinks = [{label:'企業公式サイト',url:article.official_url||(company&&company.official_url),name:article.company_name},{label:'サステナビリティ情報',url:article.sustainability_url||(company&&company.sustainability_url),name:'サステナビリティページ'},{label:'IR情報',irl:article.ir_url||(company&&company.ir_url),name:'投資宷向疮情報'
+}].filter(l=>l!��ɰ��(������Ё�Չ1����!ѵ����Չ1���̹���������؁�����􉑅ф�ɽ܈������������􉑅ф������������������������񄁡ɕ������ɱ�хɝ���}�������ɕ�􉹽�����ȁ��ɕ���ɕȈ��������ɰ������������������������屔������������\��������𽑥��������������(������Ё�����M��ѥ����ͽ�ɍ�!��������!ѵ����Չ1����!ѵ�������؁��屔􉉅���ɽչ��مȠ��ݡ�є�퉽ɑ�������ͽ����مȠ����������퉽ɑ�ȵɅ�����مȠ��Ʌ���̵�������������������ɝ������ѽ���������́��屔􉙽�еͥ����ɕ�홽�еݕ������������ѕȵ���������ɕ��ѕ�е�Ʌ�͙�ɴ�����ɍ�͔퍽����مȠ�������������ɝ������ѽ���������r[�R���������ώ
+������ͽ�ɍ�!��������!ѵ�����Չ1����!ѵ��𽑥����耜��(����չй�����!Q50��(�����؁��屔􉉅���ɽչ��مȠ���ɕ��������������������������(�������؁�����􉍽�х���Ȉ�(���������؁������ɕ����յ�����屔􉍽����مȠ���ɕ���������(����������񄁡ɕ�􉥹��๡ѵ�����屔􉍽����مȠ���ɕ����������o�����(����������������������ɕ����յ��͕����������(����������񄁡ɕ���ѥ���̹�ѵ�����屔􉍽����مȠ���ɕ�����������c��/�������(����������������������ɕ����յ��͕����������(������������������屔􉍽����مȠ���ɕ���������ٕə���顥�����ѕ�е�ٕə���镱���ͥ��ݡ�є������鹽�Ʌ�����ݥ�Ѡ�����������ѥ�����Ʌ�ͱ�ѕ�}ѥѱ��������(��������𽑥��(���������؁��屔������������ѽ��������(�����������؁��屔􉑥�����陱��흅�����홱���Ʌ���Ʌ����ɝ������ѽ��������(������������������������х�����屔􉉅���ɽչ�����5�ф�������𜍐�͑���퍽�������5�ф���������ɐلј��������5�ф����������ѥ�������}�����������(���������������ѥ�������}�Չ��������������������х��х��������������ѥ�������}�Չ�������������耜��(��������������ɕ�1��������������������х�����屔􉉅���ɽչ��ɝ�����԰��԰��԰�Ĥ퍽�����ɕ�1���������������ɕ�1�������������������耜��(����������𽑥��(�����������ā��屔􉙽�е�������مȠ�����е͕ɥ��홽�еͥ�鍱����ĸ�ɕ��̸��ܰȸ�ɕ��퍽����مȠ���ɕ����������������ĸ�����ɝ������ѽ�����������ѥ�����Ʌ�ͱ�ѕ�}ѥѱ�����(�������������ѥ����ͽ�ɍ�}ѥѱ�������ѥ����ͽ�ɍ�}ѥѱ������ѥ�����Ʌ�ͱ�ѕ�}ѥѱ����������屔􉙽�еͥ���ɕ�퍽����مȠ���ɕ����������ɝ������ѽ���������:��0耑��ѥ����ͽ�ɍ�}ѥѱ�������耜��(�����������؁��屔􉑥�����陱��텱�����ѕ��鍕�ѕ�흅������홱���Ʌ���Ʌ���(��������������������屔􉙽�еݕ��������퍽����مȠ���ɕ�������홽�еͥ���ɕ������ѥ�����������}�����������(��������������������屔􉙽�е�������مȠ�����е�����홽�еͥ����ɕ�퍽����مȠ���ɕ������������ѥ����ѥ���Ȁ����ѥ����ѥ���Ȭ������耜����5I-Q}1	1m��ѥ������ɭ��u���ѥ������ɭ�����������(��������������������屔􉙽�е�������مȠ�����е�����홽�еͥ����ɕ�퍽����مȠ���ɕ����������홽ɵ���є���ѥ�����Չ��͡��}�Х�������(���������������ѥ����ͽ�ɍ�}����������������屔􉙽�еͥ����ɕ�퍽����مȠ���ɕ�����������W�R��耑��ѥ����ͽ�ɍ�}�������������耜��(����������𽑥��(��������𽑥��(������𽑥��(����𽑥��(�����؁�����􉍽�х���Ȉ�(�������؁�������ѥ��������Ј�(��������񵅥��(����������񄁡ɕ���ѥ���̹�ѵ��������􉉅����������@���c��/��������"�,��(�����������؁�������ѥ�����յ���䵉������������.W��������������ѥ�����յ������P�����𽑥��(�����������؁�����􉅤���������؁�����􉅤������������Ȉ������������􉅤��������$�91eM%L���������+���
+#�
++�������W������𽑥���������ѥ������}������х����P�����𽑥��(�����������؁��屔􉉅���ɽչ��مȠ��ݡ�є�퉽ɑ�������ͽ����مȠ����������퉽ɑ�ȵɅ�����مȠ��Ʌ���̵�������������������ɝ������ѽ��������(�������������؁��屔􉑥�����陱��텱�����ѕ��鍕�ѕ�����ѥ�䵍��ѕ������������ݕ�����ɝ������ѽ������홱���Ʌ���Ʌ�흅��������(���������������́��屔􉙽�е�������مȠ�����е͕ɥ��홽�еͥ��ĸ��ɕ�퍽����مȠ��������������W����
+�
+ώ
+���Ϟ�����(���������������؁��屔􉑥�����陱��텱�����ѕ��鍕�ѕ�흅����������������屔􉙽�е�������مȠ�����е�����홽�еͥ��ĸ�ɕ�홽�еݕ��������퍽�����Ʌ�������������Ʌ�����������������������屔􉙽�е�������مȠ�����е�����홽�еͥ���ɕ�퍽����مȠ���������������ѥ����ѽх�}͍�ɕ����M
+=I}5a}Q=Q1��
+�������𽑥��(������������𽑥��(�������������х����������͍�ɔ���х������͍�ɕI�����х����(����������𽑥��(������������х��!ѵ������؁��屔􉉅���ɽչ��مȠ��ݡ�є�퉽ɑ�������ͽ����مȠ����������퉽ɑ�ȵɅ�����مȠ��Ʌ���̵�������������������ɝ������ѽ���������́��屔􉙽�еͥ����ɕ�홽�еݕ������������ѕȵ���������ɕ��ѕ�е�Ʌ�͙�ɴ�����ɍ�͔퍽����مȠ�������������ɝ������ѽ���������"��{�
+��
+�����؁��屔􉑥�����陱��홱���Ʌ���Ʌ�흅���������х��!ѵ��𽑥��𽑥����耜��(�����������������M��ѥ���(�����������؁������͡�ɔ���Ȉ�(���������������ѽ��������͡�ɔ��Ѹ���������􉹅٥��ѽȹ�������ɐ��ɥѕQ��С����ѥ����ɕ���ѡ�̹ѕ��
+��ѕ�����L��
+ώS��_���_�|����MY<��Ёݥ�Ѡ��Ј���������Ј�����􉹽������ɽ�����ɕ��
+���Ȉ���ɽ���ݥ�Ѡ�Ȉ�٥��	��������Ѐ�Ј����Ѡ���4����̈́ԀԀ������ܸ�и�Ѱ̴̈́ԀԀ������ܸ�ܴܸ�ݰ�ĸ�Ȁĸ�Ĉ�����Ѡ���4�Ѐ�ńԀԀ������ܸ�д��Ѱ�̀̈́ԀԀ������ܸ�܀ܸ�ݰĸ�Ĵĸ�Ĉ����ٜ��UI3�
+K�
+��S�
+�</button>
+            ${article.source_url ? `<a href="${article.source_url}" target="_blank" rel="noopener noreferrer" class="share-btn">📄 元記事ゐ読　 ↗</a>` : ''}
           </div>
           ${relatedHtml}
         </main>
-
         <aside class="article-sidebar">
-          <div class="sidebar-card">
-            <div class="sidebar-title">企業情報</div>
-            <div class="company-name-big">${article.company_name}</div>
-            <div class="company-industry">${article.industry}</div>
-            <div class="company-stock">${article.ticker?article.ticker+' · ':''}${MARKET_LABEL[article.market]||article.market}</div>
-            <div class="data-row"><span class="data-label">CSR大分類</span><span class="data-value">${article.csr_type}</span></div>
-            <div class="data-row"><span class="data-label">関係性</span><span class="data-value">${(RELATION_TYPE_LABEL[article.relation_type]||{}).label||'—'}</span></div>
-            <div class="data-row"><span class="data-label">ステータス</span><span class="data-value">${renderStatusBadge(article.status)}</span></div>
-            <div class="data-row"><span class="data-label">収集日</span><span class="data-value">${formatDate(article.fetched_at)}</span></div>
-            <div style="margin-top:16px;"><a href="companies.html" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">この企業の記事を見る</a></div>
-          </div>
-          <div class="sidebar-card">
-            <div class="sidebar-title">評価スコア</div>
-            <div style="text-align:center;padding:8px 0 16px;">
-              <span style="font-family:var(--font-serif);font-size:3rem;color:${rank.color};line-height:1;">${rank.label}</span>
-              <div style="font-family:var(--font-mono);font-size:.85rem;color:var(--ink-300);margin-top:4px;">${article.total_score} / ${SCORE_MAX_TOTAL} 点</div>
-            </div>
-            ${renderScoreBar(article.total_score||0)}
-            <div style="margin-top:12px;font-size:.76rem;color:var(--ink-300);line-height:1.6;">社会的明確性・継続性・事業連動性・具体性・参考価値の5軸</div>
-          </div>
-          <div class="sidebar-card">
-            <div class="sidebar-title">CSRテーマ</div>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-              <span class="tag" style="background:${csrMeta.color||'#d8f3dc'};color:${csrMeta.accent||'#2d6a4f'};">${csrMeta.icon||''} ${article.csr_type}</span>
-              ${article.csr_subtype?`<span class="tag tag-industry">${article.csr_subtype}</span>`:''}
-            </div>
-            <a href="themes.html" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">テーマ一覧へ</a>
-          </div>
-          <div class="sidebar-card" style="background:var(--cream-light);">
-            <div class="sidebar-title">記事情報</div>
-            <div class="data-row"><span class="data-label">記事ID</span><span class="data-value" style="font-family:var(--font-mono);font-size:.7rem;">${article.article_id}</span></div>
-            <div class="data-row"><span class="data-label">公開日</span><span class="data-value">${formatDate(article.published_at)}</span></div>
-            <div class="data-row"><span class="data-label">収集日</span><span class="data-value">${formatDate(article.fetched_at)}</span></div>
-            <div class="data-row"><span class="data-label">対象ステークホルダー</span><span class="data-value">${article.stakeholder_type||'—'}</span></div>
-          </div>
+          <div class="sidebar-card"><div class="sidebar-title">企業情報</div><div class="company-name-big">${article.company_name}</div><div class="company-industry">${article.industry||''}</div><div class="company-stock">${article.ticker?article.ticker+& middot; ':''}${MARKET_LABEL[article.market]||article.market||''}</div><div class="data-row"><span class="data-label">CSR大分顝</span><span class="data-value">${article.csr_type}</span></div><div class="data-row"><span class="data-label">関係性</span><span class="data-value">${(RELATION_TYPE_LABEL[article.relation_type]||{}).label||'—'}</span></div><div class="data-row"><span class="data-label">収闆日</span><span class="data-value">${formatDate(article.fetched_at)}</span></div><div style="margin-top:16px;"><a href="companies.html" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">この企業の記事を覯る</a></div></div>
+          <div class="sidebar-card"><div class="sidebar-title">評価スコア</div><div style="text-align:center;padding:8px 0 16px;"><span style="font-family:var(--font-serif);font-size:3rem;color:${rank.color};line-height:1;">${rank.label}</span><div style="font-family:var(--font-mono);font-size:.85rem;color:var(--ink-300);margin-top:4px;">${article.total_score} / ${SCORE_MAX_TOTAL} 点</div></div>${renderScoreBar(article.total_score||0)}<div style="margin-top:12px;font-size:.76rem;color:var(--ink-300);line-height:1.6;">社会业匎精‎継続砀‎事橭開つ総合評価スコア詳細の弁軸</div></div>
+          <div class="sidebar-card"><div class="sidebar-title">CSRテーマ</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><span class="tag" style="background:${csrMeta.color||'#d8f3dc'};color:${csrMeta.accent||'#2d6a4f'};">${csrMeta.icon||''} ${article.csr_type}</span>${article.csr_subtype?`<span class="tag tag-industry">${article.csr_subtype}</span>`:''}</div><a href="themes.html" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">テーマ一覧へ</a></div>
+          ${article.source_url ? `<div class="sidebar-card" style="background:var(--green-50);border-color:var(--green-200);"><div class="sidebar-title" style="color:var(--green-700);">📄 引用元記事</div><p style="font-size:.78rem;color:var(--ink-500);margin-bottom:12px;line-height:1.5;">${article.source_name||'外僨サイト'}</p><a href="${article.source_url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;border-color:var(--green-400);color:var(--green-700);">元記事ゐ誝む ↗</a></div>` : ''}
+          <div class="sidebar-card" style="background:var(--cream-light);"><div class="sidebar-title">記事情報</div><div class="data-row"><span class="data-label">記事ID</span><span class="data-value" style="font-family:var(--font-mono);font-size:.7rem;">${article.article_id}</span></div><div class="data-row"><span class="data-label">公開づ叕</span><span class="data-value">${formatDate(article.published_at)}</span></div><div class="data-row"><span class="data-label">収闆日</span><span class="data-value">${formatDate(article.fetched_at)}</span></div><div class="data-row"><span class="data-label">ステークホルダー</span><span class="data-value">${article.stakeholder_type||'—'}</span></div></div>
         </aside>
       </div>
     </div>`;
   initScrollAnimations();
-}
+})();
 </script>
 </body>
 </html>
