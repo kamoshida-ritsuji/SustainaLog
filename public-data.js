@@ -48,7 +48,7 @@ function getPublicArticlesByCsrType(t) { return getPublicArticles().filter(a => 
 function getPublicArticlesByCompany(n) { return getPublicArticles().filter(a => a.company_name === n); }
 function getPublicDataSource() { return { source: _publicSource, error: _publicError }; }
 
-acync function initPublicPage(mountId, onLoad) {
+async function initPublicPage(mountId, onLoad) {
   const el = document.getElementById(mountId);
   if (el) el.innerHTML = '<div style="text-align:center;padding:64px 0;"><div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;"></div></div>';
   await loadPublicArticles();
