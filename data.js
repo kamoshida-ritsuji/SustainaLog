@@ -106,6 +106,7 @@ function renderHeader(activePage = '') {
     { href: 'articles.html',  label: '記事一覧' },
     { href: 'companies.html', label: '企業別' },
     { href: 'themes.html',    label: 'テーマ別' },
+    { href: 'compare.html',   label: '比較' },
     { href: 'dashboard.html', label: '分析' },
     { href: 'about.html',     label: 'About' },
   ];
@@ -123,7 +124,7 @@ function renderHeader(activePage = '') {
             <span class="logo-main">SustainaLog</span>
             <span class="logo-badge">β</span>
           </a>
-          <nav class="site-nav">${navHtml}</nav>
+           <nav class="site-nav">${navHtml}</nav>
           <a href="articles.html" class="header-cta">記事を探す</a>
           <button class="hamburger" aria-label="メニュー" onclick="toggleMobileNav()">
             <span></span><span></span><span></span>
