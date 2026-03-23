@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>テーマ別 — SustainaLog</title>
+  <meta name="description" content="CSR・サステナビリティ活動をテーマ別に探せます。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .theme-card-big {
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+    }
+    .theme-card-big:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .theme-card-header {
+      padding: 32px 28px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .theme-icon-big {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .theme-card-title {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      color: var(--ink-900);
+      margin-bottom: 6px;
+    }
+    .theme-card-desc {
+      font-size: 0.82rem;
+      color: var(--ink-500);
+      line-height: 1.6;
+    }
+    .theme-card-footer {
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--ink-100);
+      background: var(--cream-light);
+    }
+    .theme-progress {
+      width: 100%;
+      height: 4px;
+      background: var(--ink-100);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .theme-progress-bar {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--green-500);
+      transition: width 1s ease;
+    }
+    .theme-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 28px 24px;
+    }
+    .theme-keyword {
+      font-size: 0.72rem;
+      color: var(--ink-400, #9a9490);
+      background: var(--cream);
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid var(--ink-100);
+    }
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">Themes</p>
+    <h1>テーマから探す</h1>
+    <p>SDGs・ESG・TNFDなど、主要フレームワークに対応したテーマカテゴリで活動を分類しています。</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- SDGs Reference Banner -->
+    <div style="background:linear-gradient(135deg,var(--green-800),var(--green-700));border-radius:var(--radius-xl);padding:32px 40px;margin-bottom:48px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+      <div>
+        <p style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--green-300);margin-bottom:8px;">Framework Alignment</p>
+        <h3 style="font-family:var(--font-serif);font-size:1.3rem;color:var(--cream);margin-bottom:6px;">SDGs・GRI・TCFD・TNFDに対応</h3>
+        <p style="font-size:0.84rem;color:var(--green-200);">各テーマは国際的なサステナビリティフレームワークに紐づけて分類しています。</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        ${['SDGs','GRI','TCFD','TNFD','ESG'].map(f=>`
+          <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--green-100);font-size:0.75rem;font-weight:700;padding:6px 14px;border-radius:99px;">${f}</span>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- Themes Grid -->
+    <div id="themes-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;"></div>
+
+    <!-- Coming Soon -->
+    <div style="background:var(--green-50);border:1px dashed var(--green-300);border-radius:var(--radius-xl);padding:40px;text-align:center;margin-top:48px;">
+      <p style="font-size:1.4rem;margin-bottom:12px;">📊</p>
+      <h3 style="font-family:var(--font-serif);font-size:1.1rem;color:var(--green-800);margin-bottom:8px;">テーマ別トレンドグラフを準備中</h3>
+      <p style="font-size:0.86rem;color:var(--ink-500);">テーマ別の企業活動トレンド・業界比較グラフを近日公開予定です。</p>
+    </div>
+  </div>
+</section>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('themes.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+const THEMES_EXTENDED = [
+  {
+    name: "気候変動・脱炭素",
+    icon: "🌡️",
+    count: 24,
+    color: "#d8f3dc",
+    accent: "#2d6a4f",
+    desc: "温室効果ガス削減・RE100・カーボンオフセット・TCFD開示など、気候変動対応に関する企業活動を集約しています。",
+    keywords: ["カーボンニュートラル","RE100","TCFD","SBT","グリーンボンド","Scope3"],
+    maxCount: 30,
+  },
+  {
+    name: "循環経済・廃棄物削減",
+    icon: "♻️",
+    count: 18,
+    color: "#fef9ef",
+    accent: "#c9a84c",
+    desc: "プラスチック削減・リサイクル推進・廃棄物ゼロ・サーキュラーエコノミーへの移行に関する活動を収録。",
+    keywords: ["プラスチックフリー","リサイクル","廃棄物ゼロ","サーキュラー","包装材"],
+    maxCount: 30,
+  },
+  {
+    name: "生物多様性",
+    icon: "🌿",
+    count: 11,
+    color: "#e8f4ec",
+    accent: "#40916c",
+    desc: "TNFD対応・自然資本保全・生態系サービスへの取組みを整理。2030年ネイチャーポジティブ目標への貢献度を追跡。",
+    keywords: ["TNFD","ネイチャーポジティブ","生態系","自然資本","森林保全"],
+    maxCount: 30,
+  },
+  {
+    name: "ESG金融",
+    icon: "📊",
+    count: 15,
+    color: "#f0f4ff",
+    accent: "#3b64c8",
+    desc: "グリーンボンド・ソーシャルボンド・ESG投資・インパクト投資など金融セクターのサステナビリティ活動を掲載。",
+    keywords: ["グリーンボンド","ESG投資","インパクト投資","SFDR","タクソノミー"],
+    maxCount: 30,
+  },
+  {
+    name: "教育・人材育成",
+    icon: "🎓",
+    count: 9,
+    color: "#fff3f0",
+    accent: "#b5522a",
+    desc: "従業員研修・リスキリング・次世代人材育成・インターンシップ・奨学金など人的資本への投資を追跡。",
+    keywords: ["リスキリング","人的資本","D&I","奨学金","デジタル教育"],
+    maxCount: 30,
+  },
+  {
+    name: "水・資源保全",
+    icon: "💧",
+    count: 8,
+    color: "#e8f6ff",
+    accent: "#2b6cb0",
+    desc: "水ストレス対応・ウォータースチュワードシップ・希少資源の節約・鉱物サプライチェーン管理に関する活動。",
+    keywords: ["AWS","水ストレス","節水","希少金属","マテリアリティ"],
+    maxCount: 30,
+  },
+  {
+    name: "食品ロス削減",
+    icon: "🍱",
+    count: 7,
+    color: "#fff8ec",
+    accent: "#b87333",
+    desc: "食品廃棄削減・フードバンク連携・需要予測AI活用・賞味期限延長技術など食ロス対策の企業事例を収録。",
+    keywords: ["フードロス","フードバンク","需要予測","賞味期限","廃棄コスト"],
+    maxCount: 30,
+  },
+  {
+    name: "地域社会・コミュニティ",
+    icon: "🤝",
+    count: 10,
+    color: "#f5f0ff",
+    accent: "#6b46c1",
+    desc: "地域振興・被災地支援・文化財保護・地域雇用創出など、地域コミュニティへの貢献活動を掲載。",
+    keywords: ["地域創生","社会貢献","被災地支援","ボランティア","共助"],
+    maxCount: 30,
+  },
+];
+
+document.getElementById('themes-grid').innerHTML = THEMES_EXTENDED.map(t => `
+  <a href="articles.html" class="theme-card-big animate-in">
+    <div class="theme-card-header">
+      <div class="theme-icon-big" style="background:${t.color};color:${t.accent}">${t.icon}</div>
+      <div>
+        <h3 class="theme-card-title">${t.name}</h3>
+        <p class="theme-card-desc">${t.desc}</p>
+        <div class="theme-progress">
+          <div class="theme-progress-bar" style="width:${Math.round(t.count/t.maxCount*100)}%;background:${t.accent};"></div>
+        </div>
+      </div>
+    </div>
+    <div class="theme-keywords">
+      ${t.keywords.map(k=>`<span class="theme-keyword">${k}</span>`).join('')}
+    </div>
+    <div class="theme-card-footer">
+      <span style="font-size:0.82rem;color:var(--ink-500);">${t.count}件の記事</span>
+      <span style="font-size:0.82rem;font-weight:700;color:${t.accent};">記事を見る →</span>
+    </div>
+  </a>
+`).join('');
+
+initScrollAnimations();
+</script>
+</body>
+</html>
