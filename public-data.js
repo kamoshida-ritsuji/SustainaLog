@@ -75,8 +75,8 @@ function getCompanySummaries() {
     const key = a.company_name; if (!key) return;
     if (!map[key]) {
       const m = typeof COMPANY_MASTER !== 'undefined'
-        ? COMPAY_MASTER.find(c => c.company_name===key||(c.aliases&&c.aliases.includes(key))) : null;
-      map[key] = {company_name:key,ticker:a.ticker||(m&&m.ticker)||null,market:a.market||(m&&m.market)||null,industry:a.industry||(m&&m.industry)||'',icon:[]&&m.icon)||'🏢',official_url:[]&&m.official_url)||null,sustainability_url:(m&&m.sustainability_url)||null,ir_url:(m&&m.ir_url)||null,articles:[],scores:[],theme_count:{}};
+        ? COMPANY_MASTER.find(c => c.company_name===key||(c.aliases&&c.aliases.includes(key))) : null;
+      map[key] = {company_name:key,ticker:a.ticker||(m&&m.ticker)||null,market:a.market||(m&&m.market)||null,industry:a.industry||(m&&m.industry)||'',icon:(m&&m.icon)|||'🏢',official_url:(m&&m.official_url)||null,sustainability_url:(m&&m.sustainability_url)||null,ir_url:(m&&m.ir_url)||null,articles:[],scores:[],theme_count:{}};
     }
     map[key].articles.push(a);
     if (a.total_score) map[key].scores.push(Number(a.total_score)||0);
