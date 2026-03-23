@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 — SustainaLog Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ================================================
+       ADMIN — 管理画面専用スタイル
+       ================================================ */
+
+    body { background: #f0f0ee; }
+
+    /* ── Admin Header ── */
+    .admin-header {
+      background: var(--ink-900);
+      color: var(--white);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 2px solid var(--green-700);
+    }
+    .admin-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      gap: 16px;
+    }
+    .admin-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .admin-logo-main {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      color: var(--cream);
+    }
+    .admin-badge {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      background: var(--green-700);
+      color: var(--white);
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .admin-nav-link {
+      font-size: 0.82rem;
+      color: var(--green-300);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition);
+    }
+    .admin-nav-link:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .admin-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--ink-300);
+    }
+    .admin-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--green-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    /* ── Admin Layout ── */
+    .admin-layout {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 20px 0;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      border: 1px solid var(--ink-100);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .stat-card-num {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      color: var(--ink-900);
+      line-height: 1;
+    }
+    .stat-card-label { font-size: 0.75rem; color: var(--ink-300); margin-top: 2px; }
+
+    /* ── Tabs ── */
+    .admin-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--white);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 12px 16px 0;
+      border: 1px solid var(--ink-100);
+      border-bottom: none;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .admin-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink-300);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      border: 1.5px solid transparent;
+      border-bottom: none;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+      background: none;
+      font-family: var(--font-sans);
+    }
+    .admin-tab:hover { color: var(--ink-700); background: var(--cream-light); }
+    .admin-tab.active {
+      color: var(--ink-900);
+      background: #f0f0ee;
+      border-color: var(--ink-100);
+      border-bottom-color: #f0f0ee;
+      margin-bottom: -1px;
+    }
+    .tab-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 99px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .tab-pending  .tab-count { background: #fef9ef; color: #c9a84c; }
+    .tab-published .tab-count { background: #d8f3dc; color: #2d6a4f; }
+    .tab-rejected .tab-count { background: #fde8e0; color: #9a3b1a; }
+    .tab-all      .tab-count { background: var(--ink-100); color: var(--ink-500); }
+
+    /* ── Article List Panel ── */
+    .admin-panel {
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 20px;
+      min-height: 400px;
+    }
+
+    /* ── Toolbar ── */
+    .admin-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .admin-search-wrap { position: relative; flex: 1; max-width: 320px; }
+    .admin-search {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border: 1.5px solid var(--ink-100);
+      border-radius: 99px;
+      font-size: 0.84rem;
+      font-family: var(--font-sans);
+      background: var(--cream-light);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .admin-search:focus { border-color: var(--green-500); }
+    .admin-search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-300);
+      pointer-events: none;
+    }
+    .admin-result-count { font-size: 0.8rem; color: var(--ink-300); }
+
+    /* ── Admin Card ── */
+    .admin-cards { display: flex; flex-direction: column; gap: 10px; }
+    .admin-card {
+      background: var(--cream-light);
+      border: 1.5px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      transition: box-shadow var(--transition), border-color var(--transition);
+      cursor: pointer;
+    }
+    .admin-card:hover { box-shadow: var(--shadow-md); border-color: var(--green-300); }
+    .admin-card.status-pending_review  { border-left: 4px solid #c9a84c; }
+    .admin-card.status-published       { border-left: 4px solid #2d6a4f; }
+    .admin-card.status-rejected        { border-left: 4px solid #c0392b; opacity: 0.75; }
+
+    .admin-card-main { min-width: 0; }
+    .admin-card-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .admin-card-id {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--ink-300);
+      background: var(--ink-100);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .admin-card-title {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--ink-900);
+      margin-bottom: 4px;
+      line-height: 1.4;
+      /* 2行クランプ */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .admin-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--ink-300);
+    }
+    .admin-card-meta-item { display: flex; align-items: center; gap: 4px; }
+    .admin-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .admin-btn {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .admin-btn-approve {
+      background: var(--green-700);
+      color: var(--white);
+      border-color: var(--green-700);
+    }
+    .admin-btn-approve:hover { background: var(--green-600); }
+    .admin-btn-reject {
+      background: var(--white);
+      color: #c0392b;
+      border-color: #e8a9a0;
+    }
+    .admin-btn-reject:hover { background: #fde8e0; }
+    .admin-btn-detail {
+      background: var(--white);
+      color: var(--ink-500);
+      border-color: var(--ink-100);
+    }
+    .admin-btn-detail:hover { background: var(--cream); color: var(--ink-900); }
+    .admin-btn-revert {
+      background: var(--white);
+      color: var(--ink-500);
+      border-color: var(--ink-100);
+      font-size: 0.72rem;
+    }
+    .admin-btn-revert:hover { background: var(--cream); }
+
+    /* ── Empty State ── */
+    .admin-empty {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--ink-300);
+    }
+    .admin-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .admin-empty h3 { font-size: 1rem; color: var(--ink-500); margin-bottom: 6px; }
+    .admin-empty p { font-size: 0.84rem; }
+
+    /* ── Modal Overlay ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,20,15,0.65);
+      z-index: 500;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open { display: flex; }
+
+    /* ── Modal ── */
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 780px;
+      margin: auto;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      animation: modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(0.95) translateY(12px); }
+      to   { opacity:1; transform: scale(1)    translateY(0); }
+    }
+    .modal-header {
+      background: var(--ink-900);
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .modal-header-left { flex: 1; min-width: 0; }
+    .modal-article-id {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--green-400);
+      margin-bottom: 6px;
+    }
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 1.1rem;
+      color: var(--cream);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .modal-source-title {
+      font-size: 0.75rem;
+      color: var(--green-400);
+      font-style: italic;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background var(--transition);
+      border: none;
+      font-family: inherit;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.2); }
+
+    .modal-body { padding: 0; }
+
+    /* Modal Sections */
+    .modal-section {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+    .modal-section:last-child { border-bottom: none; }
+    .modal-section-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-300);
+      margin-bottom: 12px;
+    }
+    .modal-text {
+      font-size: 0.88rem;
+      color: var(--ink-700);
+      line-height: 1.75;
+    }
+
+    /* Info Grid */
+    .modal-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .modal-info-row {
+      display: flex;
+      flex-direction: column;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--ink-100);
+      gap: 3px;
+    }
+    .modal-info-row:nth-last-child(-n+2) { border-bottom: none; }
+    .modal-info-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--ink-300);
+      letter-spacing: 0.05em;
+    }
+    .modal-info-value {
+      font-size: 0.84rem;
+      color: var(--ink-700);
+      word-break: break-all;
+    }
+    .modal-info-value a {
+      color: var(--green-600);
+      text-decoration: none;
+    }
+    .modal-info-value a:hover { text-decoration: underline; }
+
+    /* Tags */
+    .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .modal-tag {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--cream);
+      color: var(--ink-500);
+      border: 1px solid var(--ink-100);
+    }
+
+    /* Score in modal */
+    .modal-score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .modal-score-item {
+      background: var(--cream-light);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+    }
+    .modal-score-label { font-size: 0.72rem; color: var(--ink-300); margin-bottom: 4px; }
+    .modal-score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-score-bar {
+      flex: 1;
+      height: 5px;
+      background: var(--ink-100);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .modal-score-fill { height: 100%; border-radius: 3px; background: var(--green-500); }
+    .modal-score-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--ink-700);
+    }
+    .modal-total-score {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--green-50);
+      border-radius: var(--radius-md);
+      margin-top: 10px;
+    }
+    .modal-total-rank {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .modal-total-num { font-family: var(--font-mono); font-size: 0.88rem; color: var(--ink-500); }
+
+    /* Modal Footer Actions */
+    .modal-footer {
+      padding: 16px 24px;
+      background: var(--cream-light);
+      border-top: 1px solid var(--ink-100);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .modal-footer-status { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--ink-500); }
+    .modal-footer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .modal-btn {
+      font-size: 0.84rem;
+      font-weight: 700;
+      padding: 9px 20px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all var(--transition);
+    }
+    .modal-btn-approve { background: var(--green-700); color: var(--white); border-color: var(--green-700); }
+    .modal-btn-approve:hover { background: var(--green-600); }
+    .modal-btn-reject  { background: var(--white); color: #c0392b; border-color: #e8a9a0; }
+    .modal-btn-reject:hover  { background: #fde8e0; }
+    .modal-btn-close   { background: var(--white); color: var(--ink-500); border-color: var(--ink-100); }
+    .modal-btn-close:hover   { background: var(--cream); }
+    .modal-btn-revert  { background: var(--white); color: var(--ink-300); border-color: var(--ink-100); font-size: 0.78rem; }
+    .modal-btn-revert:hover  { background: var(--cream); color: var(--ink-700); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink-900);
+      color: var(--white);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(2,1fr); }
+      .admin-card { grid-template-columns: 1fr; }
+      .admin-card-actions { flex-direction: row; }
+      .modal-info-grid { grid-template-columns: 1fr; }
+      .modal-score-grid { grid-template-columns: 1fr; }
+      .modal-footer { flex-direction: column; align-items: stretch; }
+      .modal-footer-actions { justify-content: stretch; }
+      .modal-btn { flex: 1; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .admin-tabs { gap: 2px; }
+      .admin-tab { padding: 8px 12px; font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Admin Header -->
+<header class="admin-header">
+  <div class="admin-layout">
+    <div class="admin-header-inner">
+      <div class="admin-logo">
+        <a href="index.html" style="display:flex;align-items:center;gap:10px;">
+          <span class="admin-logo-main">SustainaLog</span>
+          <span class="admin-badge">Admin</span>
+        </a>
+      </div>
+      <nav style="display:flex;gap:4px;">
+        <a href="index.html" class="admin-nav-link">← 公開サイト</a>
+        <a href="articles.html" class="admin-nav-link">記事一覧</a>
+      </nav>
+      <div class="admin-user">
+        <div class="admin-avatar">👤</div>
+        <span style="display:none;" id="username-display">管理者</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<main style="padding: 0 0 80px;">
+  <div class="admin-layout">
+
+    <!-- Page Title -->
+    <div style="padding: 24px 0 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div>
+        <p style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-300);margin-bottom:4px;">Admin Dashboard</p>
+        <h1 style="font-family:var(--font-serif);font-size:1.6rem;color:var(--ink-900);">記事承認管理</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:0.75rem;color:var(--ink-300);">最終更新:</span>
+        <span id="last-updated" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--ink-500);"></span>
+      </div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Tabs + Panel -->
+    <div>
+      <div class="admin-tabs" id="admin-tabs"></div>
+      <div class="admin-panel">
+        <!-- Toolbar -->
+        <div class="admin-toolbar">
+          <div class="admin-search-wrap">
+            <svg class="admin-search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" class="admin-search" id="admin-search" placeholder="企業名・タイトルで検索…" oninput="renderCurrentTab()">
+          </div>
+          <span class="admin-result-count" id="result-count"></span>
+        </div>
+        <!-- Cards -->
+        <div class="admin-cards" id="admin-cards"></div>
+      </div>
+    </div>
+
+  </div><!-- /admin-layout -->
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- Scripts -->
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="data.js"></script>
+<script>
+// ============================================================
+// Admin State Management
+// ============================================================
+
+// ローカルstate: article_id → status のMap
+// Google Sheets連携時は updateArticleStatus() を差し替えるだけでOK
+const localState = new Map();
+
+// 初期化: DUMMY_ARTICLESからstateを構築
+function initState() {
+  DUMMY_ARTICLES.forEach(a => {
+    localState.set(a.article_id, a.status);
+  });
+}
+
+// 現在のstatusを返す
+function getStatus(articleId) {
+  return localState.get(articleId) || ARTICLE_STATUS.PENDING_REVIEW;
+}
+
+// ステータス更新（ローカルstate）
+// Google Sheets連携時: ここでAPI呼び出しを追加するだけ
+async function updateArticleStatus(articleId, newStatus) {
+  localState.set(articleId, newStatus);
+  // TODO: Google Sheets連携時はここにAPI呼び出しを追加
+  // await fetch('/api/update-status', { method:'POST', body: JSON.stringify({articleId, newStatus}) });
+}
+
+// 現在のタブ
+let currentTab = 'pending_review';
+
+// ============================================================
+// Tab Definitions
+// ============================================================
+const TABS = [
+  { key: 'pending_review', label: '未承認',   cls: 'tab-pending',   icon: '⏳' },
+  { key: 'published',      label: '公開中',   cls: 'tab-published', icon: '✅' },
+  { key: 'rejected',       label: '却下済み', cls: 'tab-rejected',  icon: '❌' },
+  { key: 'all',            label: '全件',     cls: 'tab-all',       icon: '📋' },
+];
+
+// ============================================================
+// Filtered Articles
+// ============================================================
+function getFilteredArticles(tabKey) {
+  const query = (document.getElementById('admin-search')?.value || '').toLowerCase();
+  return DUMMY_ARTICLES.filter(a => {
+    const status = getStatus(a.article_id);
+    const matchTab = tabKey === 'all' || status === tabKey;
+    const matchQuery = !query ||
+      (a.translated_title || '').toLowerCase().includes(query) ||
+      (a.company_name || '').toLowerCase().includes(query) ||
+      (a.article_id || '').toLowerCase().includes(query) ||
+      (a.csr_type || '').toLowerCase().includes(query);
+    return matchTab && matchQuery;
+  });
+}
+
+function getCount(tabKey) {
+  return getFilteredArticles(tabKey).length;
+}
+
+// ============================================================
+// Render Stats Bar
+// ============================================================
+function renderStats() {
+  const total    = DUMMY_ARTICLES.length;
+  const pending  = DUMMY_ARTICLES.filter(a => getStatus(a.article_id) === ARTICLE_STATUS.PENDING_REVIEW).length;
+  const published= DUMMY_ARTICLES.filter(a => getStatus(a.article_id) === ARTICLE_STATUS.PUBLISHED).length;
+  const rejected = DUMMY_ARTICLES.filter(a => getStatus(a.article_id) === ARTICLE_STATUS.REJECTED).length;
+
+  document.getElementById('stats-bar').innerHTML = [
+    { icon:'📋', num: total,    label:'収集記事数',   color:'#f0f0f0', accent:'#555' },
+    { icon:'⏳', num: pending,  label:'レビュー待ち', color:'#fef9ef', accent:'#c9a84c' },
+    { icon:'✅', num: published,label:'公開中',       color:'#d8f3dc', accent:'#2d6a4f' },
+    { icon:'❌', num: rejected, label:'却下済み',     color:'#fde8e0', accent:'#9a3b1a' },
+  ].map(s => `
+    <div class="stat-card">
+      <div class="stat-icon" style="background:${s.color};color:${s.accent};">${s.icon}</div>
+      <div>
+        <div class="stat-card-num">${s.num}</div>
+        <div class="stat-card-label">${s.label}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// Render Tabs
+// ============================================================
+function renderTabs() {
+  document.getElementById('admin-tabs').innerHTML = TABS.map(t => {
+    const count = DUMMY_ARTICLES.filter(a =>
+      t.key === 'all' || getStatus(a.article_id) === t.key
+    ).length;
+    return `
+      <button class="admin-tab ${t.cls} ${currentTab === t.key ? 'active' : ''}"
+              onclick="switchTab('${t.key}')">
+        ${t.icon} ${t.label}
+        <span class="tab-count">${count}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// Render Cards
+// ============================================================
+function renderCurrentTab() {
+  const articles = getFilteredArticles(currentTab);
+  const container = document.getElementById('admin-cards');
+  const countEl   = document.getElementById('result-count');
+
+  countEl.textContent = `${articles.length}件`;
+
+  if (articles.length === 0) {
+    container.innerHTML = `
+      <div class="admin-empty">
+        <div class="admin-empty-icon">🌿</div>
+        <h3>記事がありません</h3>
+        <p>検索条件を変えるか、他のタブを確認してください。</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = articles.map(a => {
+    const status   = getStatus(a.article_id);
+    const stMeta   = ARTICLE_STATUS_LABEL[status] || {};
+    const csrMeta  = CSR_TYPE_META[a.csr_type] || {};
+    const rank     = scoreToRank(a.total_score || 0);
+    const isPending = status === ARTICLE_STATUS.PENDING_REVIEW;
+    const isPublished = status === ARTICLE_STATUS.PUBLISHED;
+
+    return `
+      <div class="admin-card status-${status}" onclick="openModal('${a.article_id}')">
+        <div class="admin-card-main">
+          <div class="admin-card-top">
+            <span class="admin-card-id">${a.article_id}</span>
+            <span style="font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;background:${stMeta.bg};color:${stMeta.color};">${stMeta.label}</span>
+            <span style="font-size:.7rem;padding:2px 8px;border-radius:99px;background:${csrMeta.color||'#eee'};color:${csrMeta.accent||'#666'};">${csrMeta.icon||''} ${a.csr_type}</span>
+          </div>
+          <div class="admin-card-title">${a.translated_title}</div>
+          <div class="admin-card-meta">
+            <span class="admin-card-meta-item">🏢 ${a.company_name}</span>
+            <span class="admin-card-meta-item">📅 ${formatDate(a.published_at)}</span>
+            <span class="admin-card-meta-item" style="font-family:var(--font-mono);color:${rank.color};font-weight:700;">${rank.label} ${a.total_score}pts</span>
+            ${a.ticker ? `<span class="admin-card-meta-item" style="font-family:var(--font-mono);">📈 ${a.ticker}</span>` : ''}
+          </div>
+        </div>
+        <div class="admin-card-actions" onclick="event.stopPropagation()">
+          ${isPending ? `
+            <button class="admin-btn admin-btn-approve" onclick="handleApprove('${a.article_id}')">✅ 承認</button>
+            <button class="admin-btn admin-btn-reject"  onclick="handleReject('${a.article_id}')">❌ 却下</button>
+          ` : ''}
+          ${isPublished ? `
+            <button class="admin-btn admin-btn-revert" onclick="handleRevert('${a.article_id}')">↩ 取り消し</button>
+          ` : ''}
+          ${status === ARTICLE_STATUS.REJECTED ? `
+            <button class="admin-btn admin-btn-revert" onclick="handleRevert('${a.article_id}')">↩ 差し戻し</button>
+          ` : ''}
+          <button class="admin-btn admin-btn-detail" onclick="openModal('${a.article_id}')">詳細</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// Tab Switch
+// ============================================================
+function switchTab(tabKey) {
+  currentTab = tabKey;
+  renderTabs();
+  renderCurrentTab();
+}
+
+// ============================================================
+// Status Actions
+// ============================================================
+async function handleApprove(articleId) {
+  await updateArticleStatus(articleId, ARTICLE_STATUS.PUBLISHED);
+  showToast('✅', '記事を承認・公開しました');
+  refreshAll();
+  closeModal();
+}
+
+async function handleReject(articleId) {
+  await updateArticleStatus(articleId, ARTICLE_STATUS.REJECTED);
+  showToast('❌', '記事を却下しました');
+  refreshAll();
+  closeModal();
+}
+
+async function handleRevert(articleId) {
+  await updateArticleStatus(articleId, ARTICLE_STATUS.PENDING_REVIEW);
+  showToast('↩', 'レビュー待ちに戻しました');
+  refreshAll();
+  closeModal();
+}
+
+function refreshAll() {
+  renderStats();
+  renderTabs();
+  renderCurrentTab();
+}
+
+// ============================================================
+// Modal
+// ============================================================
+function openModal(articleId) {
+  const a = DUMMY_ARTICLES.find(x => x.article_id === articleId);
+  if (!a) return;
+
+  const status    = getStatus(a.article_id);
+  const stMeta    = ARTICLE_STATUS_LABEL[status] || {};
+  const csrMeta   = CSR_TYPE_META[a.csr_type] || {};
+  const rank      = scoreToRank(a.total_score || 0);
+  const isPending  = status === ARTICLE_STATUS.PENDING_REVIEW;
+  const isPublished= status === ARTICLE_STATUS.PUBLISHED;
+  const isRejected = status === ARTICLE_STATUS.REJECTED;
+
+  const scoreRowsHtml = SCORE_DEFINITION.map(def => {
+    const val = Number(a[def.key]) || 0;
+    const pct = Math.round((val / def.max) * 100);
+    return `
+      <div class="modal-score-item">
+        <div class="modal-score-label">${def.label}</div>
+        <div class="modal-score-bar-wrap">
+          <div class="modal-score-bar"><div class="modal-score-fill" style="width:${pct}%;"></div></div>
+          <span class="modal-score-num">${val}/${def.max}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  const tagsHtml = (a.classification_tags || [])
+    .map(t => `<span class="modal-tag">${t}</span>`).join('');
+
+  const infoRows = [
+    { label: '企業名',               value: a.company_name },
+    { label: '証券コード',           value: a.ticker || '—' },
+    { label: '業界',                 value: a.industry },
+    { label: '市場区分',             value: MARKET_LABEL[a.market] || a.market },
+    { label: 'CSR大分類',            value: `${csrMeta.icon||''} ${a.csr_type}` },
+    { label: 'CSR小分類',            value: a.csr_subtype || '—' },
+    { label: '関係性タイプ',         value: (RELATION_TYPE_LABEL[a.relation_type]||{}).label || '—' },
+    { label: 'ステークホルダー',     value: a.stakeholder_type || '—' },
+    { label: '公開日',               value: formatDate(a.published_at) },
+    { label: '収集日',               value: formatDate(a.fetched_at) },
+    { label: '引用元名',             value: a.source_name },
+    { label: '引用元URL',            value: a.source_url, isUrl: true },
+    { label: '公式URL',              value: a.official_url, isUrl: true },
+    { label: 'IR URL',               value: a.ir_url || '—', isUrl: !!a.ir_url },
+    { label: 'サステナビリティURL',  value: a.sustainability_url, isUrl: true },
+  ];
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-article-id">${a.article_id}</div>
+        <div class="modal-title">${a.translated_title}</div>
+        ${a.source_title !== a.translated_title
+          ? `<div class="modal-source-title">原題: ${a.source_title}</div>` : ''}
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- 要約 -->
+      <div class="modal-section">
+        <div class="modal-section-title">活動の概要（要約）</div>
+        <p class="modal-text">${a.summary}</p>
+      </div>
+
+      <!-- AI解説 -->
+      <div class="modal-section" style="background:var(--green-50);">
+        <div class="modal-section-title" style="color:var(--green-600);">✦ AI解説・評価</div>
+        <p class="modal-text">${a.ai_commentary}</p>
+      </div>
+
+      <!-- 企業・記事情報 -->
+      <div class="modal-section">
+        <div class="modal-section-title">企業・記事情報</div>
+        <div class="modal-info-grid">
+          ${infoRows.map(r => `
+            <div class="modal-info-row">
+              <span class="modal-info-label">${r.label}</span>
+              <span class="modal-info-value">
+                ${r.isUrl && r.value && r.value !== '—'
+                  ? `<a href="${r.value}" target="_blank" rel="noopener">${r.value}</a>`
+                  : (r.value || '—')}
+              </span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- 分類タグ -->
+      ${tagsHtml ? `
+      <div class="modal-section">
+        <div class="modal-section-title">分類タグ</div>
+        <div class="modal-tags">${tagsHtml}</div>
+      </div>` : ''}
+
+      <!-- スコア -->
+      <div class="modal-section">
+        <div class="modal-section-title">評価スコア詳細</div>
+        <div class="modal-score-grid">${scoreRowsHtml}</div>
+        <div class="modal-total-score">
+          <span class="modal-total-rank" style="color:${rank.color};">${rank.label}</span>
+          <div>
+            <div style="font-family:var(--font-mono);font-weight:700;font-size:1.1rem;color:${rank.color};">${a.total_score}/${SCORE_MAX_TOTAL}点</div>
+            <div style="font-size:0.72rem;color:var(--ink-300);">総合評価スコア</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <!-- Footer Actions -->
+    <div class="modal-footer">
+      <div class="modal-footer-status">
+        <span>現在のステータス:</span>
+        <span style="font-weight:700;padding:3px 10px;border-radius:99px;background:${stMeta.bg};color:${stMeta.color};">${stMeta.label}</span>
+      </div>
+      <div class="modal-footer-actions">
+        ${isPending ? `
+          <button class="modal-btn modal-btn-approve" onclick="handleApprove('${a.article_id}')">✅ 承認・公開</button>
+          <button class="modal-btn modal-btn-reject"  onclick="handleReject('${a.article_id}')">❌ 却下</button>
+        ` : ''}
+        ${isPublished ? `
+          <button class="modal-btn modal-btn-revert" onclick="handleRevert('${a.article_id}')">↩ レビュー待ちに戻す</button>
+        ` : ''}
+        ${isRejected ? `
+          <button class="modal-btn modal-btn-revert" onclick="handleRevert('${a.article_id}')">↩ 差し戻す</button>
+        ` : ''}
+        <button class="modal-btn modal-btn-close" onclick="closeModal()">閉じる</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// Escキーで閉じる
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ============================================================
+// Toast
+// ============================================================
+let toastTimer;
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent  = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// Init
+// ============================================================
+function init() {
+  initState();
+
+  // 最終更新時刻
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    now.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit' });
+
+  renderStats();
+  renderTabs();
+  renderCurrentTab();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
