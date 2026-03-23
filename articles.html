@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>記事一覧 — SustainaLog</title>
+  <meta name="description" content="国内企業のCSR・サステナビリティ活動の記事一覧。テーマ・業界・企業で絞り込めます。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">Articles</p>
+    <h1>記事一覧</h1>
+    <p>国内上場企業のCSR・サステナビリティ・社会貢献活動の最新情報をお届けします。</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Search & Filter Bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="search-input" placeholder="企業名・テーマで検索..." id="searchInput" oninput="filterArticles()">
+      </div>
+      <p id="result-count" style="font-size:0.84rem;color:var(--ink-300);flex-shrink:0;"></p>
+    </div>
+
+    <!-- Theme Filters -->
+    <div style="margin-bottom:12px;">
+      <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;color:var(--ink-300);text-transform:uppercase;margin-bottom:8px;">テーマ</p>
+      <div class="filter-bar" id="theme-filters">
+        <button class="filter-btn active" onclick="setThemeFilter('', this)">すべて</button>
+        <button class="filter-btn" onclick="setThemeFilter('気候変動・脱炭素', this)">🌡️ 気候変動・脱炭素</button>
+        <button class="filter-btn" onclick="setThemeFilter('循環経済・プラスチック削減', this)">♻️ 循環経済</button>
+        <button class="filter-btn" onclick="setThemeFilter('ESG金融', this)">📊 ESG金融</button>
+        <button class="filter-btn" onclick="setThemeFilter('教育・人材育成', this)">🎓 教育・人材</button>
+        <button class="filter-btn" onclick="setThemeFilter('生物多様性', this)">🌿 生物多様性</button>
+        <button class="filter-btn" onclick="setThemeFilter('水・資源保全', this)">💧 水・資源保全</button>
+        <button class="filter-btn" onclick="setThemeFilter('食品ロス削減', this)">🍱 食品ロス</button>
+      </div>
+    </div>
+
+    <!-- Industry Filters -->
+    <div style="margin-bottom:36px;">
+      <p style="font-size:0.75rem;font-weight:700;letter-spacing:0.1em;color:var(--ink-300);text-transform:uppercase;margin-bottom:8px;">業界</p>
+      <div class="filter-bar" id="industry-filters">
+        <button class="filter-btn active" onclick="setIndustryFilter('', this)">すべて</button>
+        <button class="filter-btn" onclick="setIndustryFilter('自動車', this)">自動車</button>
+        <button class="filter-btn" onclick="setIndustryFilter('電機・精密機器', this)">電機・精密機器</button>
+        <button class="filter-btn" onclick="setIndustryFilter('金融・銀行', this)">金融・銀行</button>
+        <button class="filter-btn" onclick="setIndustryFilter('通信・IT', this)">通信・IT</button>
+        <button class="filter-btn" onclick="setIndustryFilter('食品・飲料', this)">食品・飲料</button>
+        <button class="filter-btn" onclick="setIndustryFilter('小売・コンビニ', this)">小売</button>
+        <button class="filter-btn" onclick="setIndustryFilter('サービス・HR', this)">サービス</button>
+      </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="articles-grid" id="articles-grid"></div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="empty-state-icon">🌱</div>
+      <h3>記事が見つかりませんでした</h3>
+      <p>検索条件を変えてお試しください。</p>
+    </div>
+
+    <!-- Pagination (static display) -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</section>
+
+<div id="footer-mount"></div>
+
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('articles.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+
+let activeTheme = '';
+let activeIndustry = '';
+
+function setThemeFilter(theme, btn) {
+  activeTheme = theme;
+  document.querySelectorAll('#theme-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterArticles();
+}
+
+function setIndustryFilter(industry, btn) {
+  activeIndustry = industry;
+  document.querySelectorAll('#industry-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterArticles();
+}
+
+function filterArticles() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = getPublishedArticles().map(adaptArticleForUI).filter(a => {
+    const matchTheme = !activeTheme || a.csr_type === activeTheme || a.csr_subtype === activeTheme;
+    const matchIndustry = !activeIndustry || a.industry === activeIndustry;
+    const matchQuery = !query ||
+      a.title.toLowerCase().includes(query) ||
+      a.company.toLowerCase().includes(query) ||
+      a.summary.toLowerCase().includes(query) ||
+      (a.csr_type||'').toLowerCase().includes(query);
+    return matchTheme && matchIndustry && matchQuery;
+  });
+
+  const grid = document.getElementById('articles-grid');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('result-count');
+
+  count.textContent = `${filtered.length}件の記事`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    grid.innerHTML = filtered.map(renderCard).join('');
+    initScrollAnimations();
+  }
+
+  // Pagination (dummy for now)
+  const pag = document.getElementById('pagination');
+  if (filtered.length > 6) {
+    pag.innerHTML = `
+      <button class="page-btn page-btn-arrow">←</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn page-btn-arrow">→</button>
+    `;
+  } else {
+    pag.innerHTML = '';
+  }
+}
+
+// Initial render
+filterArticles();
+</script>
+</body>
+</html>

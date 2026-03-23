@@ -118,13 +118,15 @@
 
 <div id="footer-mount"></div>
 
+<script src="schema.js"></script>
+<script src="dummy-data.js"></script>
 <script src="data.js"></script>
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('index.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
 
 // Featured
-const featured = ARTICLES.find(a => a.featured);
+const featured = getPublishedArticles().find(a => a.featured);
 if (featured) {
   document.getElementById('featured-mount').innerHTML = `
     <a href="article.html?slug=${featured.slug}" class="featured-card">
@@ -132,11 +134,11 @@ if (featured) {
         <span style="font-size:5rem;opacity:0.7">🌱</span>
       </div>
       <div class="featured-body">
-        <p class="featured-eyebrow">${featured.company} · ${featured.industry}</p>
+        <p class="featured-eyebrow">${featured.company_name} · ${featured.industry}</p>
         <h2 class="featured-title">${featured.title}</h2>
         <p class="featured-summary">${featured.summary.substring(0,120)}…</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
-          ${featured.themes.map(t=>`<span class="tag tag-theme">${t}</span>`).join('')}
+          ${featured.classification_tags.slice(0,3).map(t=>`<span class="tag tag-theme">${t}</span>`).join('')}
         </div>
         <span class="btn btn-outline btn-sm">記事を読む →</span>
       </div>
@@ -145,7 +147,7 @@ if (featured) {
 }
 
 // Latest (skip featured)
-const latest = ARTICLES.filter(a => !a.featured).slice(0,6);
+const latest = getPublishedArticles().filter(a => !a.featured).slice(0,6).map(adaptArticleForUI);
 document.getElementById('latest-mount').innerHTML = latest.map(renderCard).join('');
 
 // Themes
