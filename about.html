@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — SustainaLog</title>
+  <meta name="description" content="SustainaLogについて。国内企業のCSR・サステナビリティ情報プラットフォームのコンセプトと運営方針。">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .faq-item {
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .faq-q {
+      padding: 20px 24px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--ink-900);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .faq-q:hover { background: var(--cream-light); }
+    .faq-a {
+      padding: 0 24px 20px;
+      font-size: 0.88rem;
+      color: var(--ink-500);
+      line-height: 1.8;
+    }
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--green-200);
+    }
+    .timeline-item { position: relative; margin-bottom: 28px; }
+    .timeline-dot {
+      position: absolute;
+      left: -29px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--green-500);
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px var(--green-200);
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--green-600);
+      margin-bottom: 4px;
+    }
+    .timeline-text { font-size: 0.88rem; color: var(--ink-700); line-height: 1.6; }
+    .team-card {
+      background: var(--white);
+      border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      text-align: center;
+    }
+    .team-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--green-700), var(--green-500));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 12px;
+    }
+    .team-name { font-weight: 700; font-size: 0.95rem; color: var(--ink-900); margin-bottom: 4px; }
+    .team-role { font-size: 0.8rem; color: var(--green-600); margin-bottom: 8px; }
+    .team-bio { font-size: 0.82rem; color: var(--ink-500); line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<div id="header-mount"></div>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="page-hero-label">About</p>
+    <h1>SustainaLogについて</h1>
+    <p>国内上場企業のCSR・サステナビリティ情報を、誰でも使いやすい形で届けるプラットフォームです。</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+          <span style="font-size:4rem;">🌱</span>
+          <div style="font-family:var(--font-serif);font-size:1.5rem;color:var(--cream);text-align:center;padding:0 32px;line-height:1.4;">
+            Sustainability<br><em>Intelligence</em><br>for Japan
+          </div>
+        </div>
+      </div>
+      <div class="about-text">
+        <h2>なぜSustainaLogを<br>作るのか</h2>
+        <p>日本企業のCSR・サステナビリティ活動は膨大な情報量がありますが、各社のウェブサイトや報告書に散在しており、横断的に比較・追跡することが困難でした。</p>
+        <p>SustainaLogは、これらの情報を自動収集・整理・AI解説付きで届けることで、投資家・研究者・ビジネスパーソン・学生が「日本企業の今」を素早く把握できる場を提供します。</p>
+        <div class="value-cards">
+          <div class="value-card">
+            <div class="value-icon">🔍</div>
+            <div class="value-text">
+              <h4>収集・整理</h4>
+              <p>各社のプレスリリース・統合報告書・ウェブサイトから情報を自動収集し、統一フォーマットで整理します。</p>
+            </div>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">🤖</div>
+            <div class="value-text">
+              <h4>AI解説</h4>
+              <p>専門的な活動内容をAIが平易に解説し、国際フレームワーク（SDGs・TCFD・TNFD）との対応も示します。</p>
+            </div>
+          </div>
+          <div class="value-card">
+            <div class="value-icon">📊</div>
+            <div class="value-text">
+              <h4>可視化・比較</h4>
+              <p>企業間・業界間・テーマ別のトレンドを可視化し、サステナビリティの「今」を直感的に把握できます。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mission Numbers -->
+<section class="section section-alt">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px;">
+      <p class="section-label">Our Mission in Numbers</p>
+      <h2 class="section-title">数字で見るSustainaLog</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
+      ${[
+        {num:'248+', label:'収録記事数', desc:'随時追加中'},
+        {num:'87社', label:'掲載企業数', desc:'東証プライム中心'},
+        {num:'18', label:'テーマカテゴリ', desc:'SDGs対応'},
+        {num:'毎日', label:'情報更新', desc:'自動収集（予定）'},
+      ].map(s=>`
+        <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-xl);padding:32px 24px;text-align:center;" class="animate-in">
+          <div style="font-family:var(--font-serif);font-size:2.4rem;color:var(--green-700);line-height:1;margin-bottom:8px;">${s.num}</div>
+          <div style="font-weight:700;font-size:0.9rem;color:var(--ink-900);margin-bottom:4px;">${s.label}</div>
+          <div style="font-size:0.78rem;color:var(--ink-300);">${s.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+</section>
+
+<!-- Roadmap -->
+<section class="section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
+      <div>
+        <p class="section-label">Roadmap</p>
+        <h2 class="section-title" style="margin-bottom:36px;">開発ロードマップ</h2>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">Phase 1（現在）</div>
+            <div class="timeline-text"><strong>基本サイト構築</strong> — 記事一覧・詳細・企業別・テーマ別ページのUI完成。ダミーデータで導線確認。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:var(--green-300);"></div>
+            <div class="timeline-date">Phase 2（近日）</div>
+            <div class="timeline-text"><strong>データ収集・自動化</strong> — Google Sheets連携・スクレイピング自動化・CSV管理機能の追加。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:var(--ink-100);"></div>
+            <div class="timeline-date">Phase 3（予定）</div>
+            <div class="timeline-text"><strong>可視化・分析強化</strong> — トレンドグラフ・企業スコア・業界比較チャートの実装。</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:var(--ink-100);"></div>
+            <div class="timeline-date">Phase 4（将来）</div>
+            <div class="timeline-text"><strong>コミュニティ・API</strong> — 専門家による解説投稿・外部サービス向けデータAPI提供。</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="section-label">FAQ</p>
+        <h2 class="section-title" style="margin-bottom:36px;">よくある質問</h2>
+        <div>
+          ${[
+            {q:'情報の信頼性はどう担保していますか？', a:'掲載する情報はすべて各企業の公式サイト・プレスリリース・統合報告書を一次ソースとし、引用元URLを明記しています。AI解説はあくまで参考情報として提供しています。'},
+            {q:'データの更新頻度は？', a:'現在はβ版のため手動更新を行っています。Phase 2以降は自動収集・定期更新を実装予定です。'},
+            {q:'企業の情報掲載を依頼できますか？', a:'掲載企業の追加リクエストはお問い合わせフォームからご連絡ください。公開情報を元に収録を検討します。'},
+            {q:'商用利用・データ活用は可能ですか？', a:'個人・研究目的での利用は歓迎します。商用・大量データ取得については別途ご相談ください。'},
+          ].map(f=>`
+            <div class="faq-item">
+              <div class="faq-q">${f.q} <span>▾</span></div>
+              <div class="faq-a">${f.a}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="background:var(--green-800);padding:72px 0;">
+  <div class="container" style="text-align:center;">
+    <h2 style="font-family:var(--font-serif);font-size:clamp(1.6rem,4vw,2.2rem);color:var(--cream);margin-bottom:16px;">一緒にサステナビリティ情報を広めましょう</h2>
+    <p style="color:var(--green-200);margin-bottom:32px;font-size:0.95rem;">フィードバック・情報提供・コラボレーションを歓迎します。</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="articles.html" class="btn btn-primary">記事を読む</a>
+      <a href="mailto:hello@sustainalog.jp" class="btn" style="color:var(--green-200);border:2px solid rgba(255,255,255,0.2);padding:12px 24px;border-radius:4px;font-weight:700;font-size:0.9rem;">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<div id="footer-mount"></div>
+
+<script src="data.js"></script>
+<script>
+document.getElementById('header-mount').innerHTML = renderHeader('about.html');
+document.getElementById('footer-mount').innerHTML = renderFooter();
+initScrollAnimations();
+</script>
+</body>
+</html>
