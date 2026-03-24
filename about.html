@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About — SustainaLog</title>
-  <meta name="description" content="SustainaLogについて。国内企業のCSR・サステナビリティ情報プラットフォームのコンセプトと運営方針。">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <meta name="description" content="SustainaLogについて。国内企業のCsr・サステナビリティ情報プラットフォームのコンセプトと運営方针。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127807;</text></svg>">
   <meta property="og:type" content="website">
   <meta property="og:title" content="About — SustainaLog">
-  <meta property="og:description" content="SustainaLogについて。国内企業のCSR・サステナビリティ情報プラットフォームのコンセプトと運営方針。">
+  <meta property="og:description" content="SustainaLogについて。国内企業のCsr・サステナビリティ情報プラットフォームのコンセプトと運営方针。">
   <meta property="og:site_name" content="SustainaLog">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="style.css">
@@ -29,65 +29,72 @@
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
+      user-select: none;
       transition: background var(--transition);
     }
-    .faq-q:hover { background: var(--cream-light); }
+    .faq-q:hover { background: var(--cream-light, #faf7f2); }
+    .faq-icon {
+      font-style: normal;
+      color: var(--green-500);
+      transition: transform .25s ease;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    .faq-item.open .faq-icon { transform: rotate(180deg); }
     .faq-a {
+      display: none;
       padding: 0 24px 20px;
       font-size: 0.88rem;
       color: var(--ink-500);
       line-height: 1.8;
     }
+    .faq-item.open .faq-a { display: block; }
     .timeline { position: relative; padding-left: 32px; }
     .timeline::before {
-      content: '';
+      content: "";
       position: absolute;
-      left: 7px;
-      top: 0;
-      bottom: 0;
+      left: 7px; top: 0; bottom: 0;
       width: 2px;
       background: var(--green-200);
     }
     .timeline-item { position: relative; margin-bottom: 28px; }
     .timeline-dot {
       position: absolute;
-      left: -29px;
-      top: 4px;
-      width: 14px;
-      height: 14px;
+      left: -29px; top: 4px;
+      width: 14px; height: 14px;
       border-radius: 50%;
       background: var(--green-500);
       border: 2px solid var(--white);
       box-shadow: 0 0 0 2px var(--green-200);
     }
-    .timeline-date {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      color: var(--green-600);
-      margin-bottom: 4px;
-    }
+    .timeline-dot.near   { background: var(--green-300); }
+    .timeline-dot.future { background: var(--ink-100); box-shadow: 0 0 0 2px var(--ink-100); }
+    .timeline-date { font-family: var(--font-mono); font-size: 0.72rem; color: var(--green-600); margin-bottom: 4px; }
     .timeline-text { font-size: 0.88rem; color: var(--ink-700); line-height: 1.6; }
-    .team-card {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .stats-grid { gap: 12px; } }
+    .stat-card {
       background: var(--white);
       border: 1px solid var(--ink-100);
-      border-radius: var(--radius-lg);
-      padding: 28px;
+      border-radius: var(--radius-xl);
+      padding: 32px 24px;
       text-align: center;
     }
-    .team-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--green-700), var(--green-500));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      margin: 0 auto 12px;
+    .stat-num { font-family: var(--font-serif); font-size: 2.4rem; color: var(--green-700); line-height: 1; margin-bottom: 8px; }
+    .stat-label { font-weight: 700; font-size: 0.9rem; color: var(--ink-900); margin-bottom: 4px; }
+    .stat-desc  { font-size: 0.78rem; color: var(--ink-300); }
+    .roadmap-faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
     }
-    .team-name { font-weight: 700; font-size: 0.95rem; color: var(--ink-900); margin-bottom: 4px; }
-    .team-role { font-size: 0.8rem; color: var(--green-600); margin-bottom: 8px; }
-    .team-bio { font-size: 0.82rem; color: var(--ink-500); line-height: 1.6; }
+    @media (max-width: 768px) { .roadmap-faq-grid { grid-template-columns: 1fr; gap: 48px; } }
   </style>
 </head>
 <body>
@@ -98,16 +105,17 @@
   <div class="container">
     <p class="page-hero-label">About</p>
     <h1>SustainaLogについて</h1>
-    <p>国内上場企業のCSR・サステナビリティ情報を、誰でも使いやすい形で届けるプラットフォームです。</p>
+    <p>国内上場企業のCsr・サステナビリティ情報を、誰でも使いやすい形で届けるプラットフォームです。</p>
   </div>
 </div>
 
+<!-- Mission -->
 <section class="section">
   <div class="container">
     <div class="about-grid">
       <div class="about-visual">
         <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
-          <span style="font-size:4rem;">🌱</span>
+          <span style="font-size:4rem;">&#127807;</span>
           <div style="font-family:var(--font-serif);font-size:1.5rem;color:var(--cream);text-align:center;padding:0 32px;line-height:1.4;">
             Sustainability<br><em>Intelligence</em><br>for Japan
           </div>
@@ -115,25 +123,25 @@
       </div>
       <div class="about-text">
         <h2>なぜSustainaLogを<br>作るのか</h2>
-        <p>日本企業のCSR・サステナビリティ活動は膨大な情報量がありますが、各社のウェブサイトや報告書に散在しており、横断的に比較・追跡することが困難でした。</p>
-        <p>SustainaLogは、これらの情報を自動収集・整理・AI解説付きで届けることで、投資家・研究者・ビジネスパーソン・学生が「日本企業の今」を素早く把握できる場を提供します。</p>
+        <p>日本企業のCsr・サステナビリティ活動は膨大な情報量がありますが、各社のウェブサイトや報告書に散在しており、横断的に比較・追跡することが困難でした。</p>
+        <p>SustainaLogは、これらの情報を自動収集・整理・ai解説付きで届けることで、投資家・研究者・ビジネスパーソン・学生が「日本企業の今」を素早く把握できる場を提供します。</p>
         <div class="value-cards">
           <div class="value-card">
-            <div class="value-icon">🔍</div>
+            <div class="value-icon">&#128269;</div>
             <div class="value-text">
               <h4>収集・整理</h4>
               <p>各社のプレスリリース・統合報告書・ウェブサイトから情報を自動収集し、統一フォーマットで整理します。</p>
             </div>
           </div>
           <div class="value-card">
-            <div class="value-icon">🤖</div>
+            <div class="value-icon">&#129302;</div>
             <div class="value-text">
-              <h4>AI解説</h4>
-              <p>専門的な活動内容をAIが平易に解説し、国際フレームワーク（SDGs・TCFD・TNFD）との対応も示します。</p>
+              <h4>ai解説</h4>
+              <p>専門的な活動内容をaiが平易に解説し、国際フレームワーク（sdgs・tcfd・tnfd）との対応も示します。</p>
             </div>
           </div>
           <div class="value-card">
-            <div class="value-icon">📊</div>
+            <div class="value-icon">&#128202;</div>
             <div class="value-text">
               <h4>可視化・比較</h4>
               <p>企業間・業界間・テーマ別のトレンドを可視化し、サステナビリティの「今」を直感的に把握できます。</p>
@@ -145,34 +153,44 @@
   </div>
 </section>
 
-<!-- Mission Numbers -->
+<!-- Stats -->
 <section class="section section-alt">
   <div class="container">
     <div style="text-align:center;margin-bottom:48px;">
       <p class="section-label">Our Mission in Numbers</p>
       <h2 class="section-title">数字で見るSustainaLog</h2>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;">
-      ${[
-        {num:'248+', label:'収録記事数', desc:'随時追加中'},
-        {num:'87社', label:'掲載企業数', desc:'東証プライム中心'},
-        {num:'18', label:'テーマカテゴリ', desc:'SDGs対応'},
-        {num:'毎日', label:'情報更新', desc:'自動収集（予定）'},
-      ].map(s=>`
-        <div style="background:var(--white);border:1px solid var(--ink-100);border-radius:var(--radius-xl);padding:32px 24px;text-align:center;" class="animate-in">
-          <div style="font-family:var(--font-serif);font-size:2.4rem;color:var(--green-700);line-height:1;margin-bottom:8px;">${s.num}</div>
-          <div style="font-weight:700;font-size:0.9rem;color:var(--ink-900);margin-bottom:4px;">${s.label}</div>
-          <div style="font-size:0.78rem;color:var(--ink-300);">${s.desc}</div>
-        </div>
-      `).join('')}
+    <div class="stats-grid">
+      <div class="stat-card animate-in">
+        <div class="stat-num">248+</div>
+        <div class="stat-label">収録記事数</div>
+        <div class="stat-desc">随時追加中</div>
+      </div>
+      <div class="stat-card animate-in">
+        <div class="stat-num">87社</div>
+        <div class="stat-label">掃載企業数</div>
+        <div class="stat-desc">東証プライム中心</div>
+      </div>
+      <div class="stat-card animate-in">
+        <div class="stat-num">11</div>
+        <div class="stat-label">テーマカテゴリ</div>
+        <div class="stat-desc">sdgs対応</div>
+      </div>
+      <div class="stat-card animate-in">
+        <div class="stat-num">毎日</div>
+        <div class="stat-label">情報更新</div>
+        <div class="stat-desc">自動収集（予定）</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Roadmap -->
+<!-- Roadmap + FAQ -->
 <section class="section">
   <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
+    <div class="roadmap-faq-grid">
+
+      <!-- Roadmap -->
       <div>
         <p class="section-label">Roadmap</p>
         <h2 class="section-title" style="margin-bottom:36px;">開発ロードマップ</h2>
@@ -180,41 +198,71 @@
           <div class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-date">Phase 1（現在）</div>
-            <div class="timeline-text"><strong>基本サイト構築</strong> — 記事一覧・詳細・企業別・テーマ別ページのUI完成。ダミーデータで導線確認。</div>
+            <div class="timeline-text"><strong>基本サイト構築</strong> — 記事一覧・詳細・企業別・テーマ別・比較・分析ページのui完成。Google Sheets連携でリアルタイム更新対応。</div>
           </div>
           <div class="timeline-item">
-            <div class="timeline-dot" style="background:var(--green-300);"></div>
+            <div class="timeline-dot near"></div>
             <div class="timeline-date">Phase 2（近日）</div>
-            <div class="timeline-text"><strong>データ収集・自動化</strong> — Google Sheets連携・スクレイピング自動化・CSV管理機能の追加。</div>
+            <div class="timeline-text"><strong>データ収集・自動化</strong> — スクレイピング自動化・csv管理・記事レビューワークフローの整備。</div>
           </div>
           <div class="timeline-item">
-            <div class="timeline-dot" style="background:var(--ink-100);"></div>
+            <div class="timeline-dot future"></div>
             <div class="timeline-date">Phase 3（予定）</div>
             <div class="timeline-text"><strong>可視化・分析強化</strong> — トレンドグラフ・企業スコア・業界比較チャートの実装。</div>
           </div>
           <div class="timeline-item">
-            <div class="timeline-dot" style="background:var(--ink-100);"></div>
+            <div class="timeline-dot future"></div>
             <div class="timeline-date">Phase 4（将来）</div>
-            <div class="timeline-text"><strong>コミュニティ・API</strong> — 専門家による解説投稿・外部サービス向けデータAPI提供。</div>
+            <div class="timeline-text"><strong>コミュニティ・api</strong> — 専門家による解説投稿・外部サービス向けデータapi提供。</div>
           </div>
         </div>
       </div>
+
+      <!-- FAQ -->
       <div>
         <p class="section-label">FAQ</p>
         <h2 class="section-title" style="margin-bottom:36px;">よくある質問</h2>
-        <div>
-          ${[
-            {q:'情報の信頼性はどう担保していますか？', a:'掲載する情報はすべて各企業の公式サイト・プレスリリース・統合報告書を一次ソースとし、引用元URLを明記しています。AI解説はあくまで参考情報として提供しています。'},
-            {q:'データの更新頻度は？', a:'現在はβ版のため手動更新を行っています。Phase 2以降は自動収集・定期更新を実装予定です。'},
-            {q:'企業の情報掲載を依頼できますか？', a:'掲載企業の追加リクエストはお問い合わせフォームからご連絡ください。公開情報を元に収録を検討します。'},
-            {q:'商用利用・データ活用は可能ですか？', a:'個人・研究目的での利用は歓迎します。商用・大量データ取得については別途ご相談ください。'},
-          ].map(f=>`
-            <div class="faq-item">
-              <div class="faq-q">${f.q} <span>▾</span></div>
-              <div class="faq-a">${f.a}</div>
-            </div>
-          `).join('')}
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            情報の信頼性はどう担保していますか？
+            <span class="faq-icon">&#9660;</span>
+          </div>
+          <div class="faq-a">
+            掃載する情報はすべて各企業の公式サイト・プレスリリース・統合報告書を一次ソースとし、引用元urlを明記しています。ai解説はあくまで参考情報として提供しています。
+          </div>
         </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            データの更新頻度は？
+            <span class="faq-icon">&#9660;</span>
+          </div>
+          <div class="faq-a">
+            現在はβ版のため手動更新を行っています。Phase 2以降は自動収集・定期更新を実装予定です。
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            企業の情報掃載を依頼できますか？
+            <span class="faq-icon">&#9660;</span>
+          </div>
+          <div class="faq-a">
+            掃載企業の追加リクエストはお問い合わせフォームからご連絡ください。公開情報を元に収録を検討します。
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            商用利用・データ活用は可能ですか？
+            <span class="faq-icon">&#9660;</span>
+          </div>
+          <div class="faq-a">
+            個人・研究目的での利用は歓迎します。商用・大量データ取得については別途ご相談ください。
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -238,9 +286,16 @@
 <script src="dummy-data.js"></script>
 <script src="data.js"></script>
 <script>
-document.getElementById('header-mount').innerHTML = renderHeader('about.html');
-document.getElementById('footer-mount').innerHTML = renderFooter();
+document.getElementById("header-mount").innerHTML = renderHeader("about.html");
+document.getElementById("footer-mount").innerHTML = renderFooter();
 initScrollAnimations();
+
+function toggleFaq(el) {
+  var item = el.closest(".faq-item");
+  var isOpen = item.classList.contains("open");
+  document.querySelectorAll(".faq-item.open").forEach(function(i) { i.classList.remove("open"); });
+  if (!isOpen) item.classList.add("open");
+}
 </script>
 </body>
 </html>
