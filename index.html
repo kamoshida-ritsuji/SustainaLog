@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SustainaLog — 国内企業のCSR・サステナビリティ情報プラットフォーム</title>
   <meta name="description" content="国内上場企業のCSR・サステナビリティ・社会貢献活動を収集・整理・可視化する情報プラットフォーム。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SustainaLog — 日本企業のサステナビリティ情報">
+  <meta property="og:description" content="国内上場企業のCSR・サステナビリティ・社会貢献活動を収集・整理・可視化する情報プラットフォーム。">
+  <meta property="og:site_name" content="SustainaLog">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="style.css">
   <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 </head>
@@ -104,28 +110,42 @@
 document.getElementById('header-mount').innerHTML = renderHeader('index.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
 
-document.getElementById('themes-mount').innerHTML = THEMES.map(t => `
-  <a href="themes.html" class="theme-tile">
-    <div class="theme-icon" style="background:${t.color};color:${t.accent}">${t.icon}</div>
-    <div><div class="theme-name">${t.name}</div><div class="theme-count">${t.count}件の記事</div></div>
-  </a>`).join('');
 
-document.getElementById('companies-mount').innerHTML = COMPANIES.map(c => `
-  <a href="companies.html" class="company-card">
-    <div class="company-logo-placeholder">${c.icon}</div>
-    <div class="company-card-name">${c.name}</div>
-    <div class="company-card-industry">${c.industry}</div>
-    <div class="company-card-count">${c.count}件の記事</div>
-  </a>`).join('');
+
+
 
 (async () => {
   await loadPublicArticles();
   const articles = getPublicArticles();
+  const csrMeta = (typeof CSR_TYPE_META !== 'undefined') ? CSR_TYPE_META : {};
   const companies = new Set(articles.map(a => a.company_name).filter(Boolean));
   const themes    = new Set(articles.map(a => a.csr_type).filter(Boolean));
   document.getElementById('stat-articles').textContent  = articles.length;
   document.getElementById('stat-companies').textContent = companies.size || '—';
-  document.getElementById('stat-themes').textContent    = themes.size   || THEMES.length;
+  document.getElementById('stat-themes').textContent    = themes.size || Object.keys(csrMeta).length;
+
+  // テーマグリッド
+  const themeSummaries = (typeof getThemeSummaries === 'function') ? getThemeSummaries() : [];
+  const themeItems = themeSummaries.length > 0
+    ? themeSummaries.slice(0, 8).map(t => ({ icon: t.icon, name: t.name, color: t.color, accent: t.accent, count: t.article_count }))
+    : Object.entries(csrMeta).slice(0, 8).map(([name, m]) => ({ icon: m.icon, name, color: m.color, accent: m.accent, count: 0 }));
+  document.getElementById('themes-mount').innerHTML = themeItems.map(t =>
+    `<a href="theme.html?name=${encodeURIComponent(t.name)}" class="theme-tile">
+      <div class="theme-icon" style="background:${t.color};color:${t.accent}">${t.icon}</div>
+      <div><div class="theme-name">${t.name}</div><div class="theme-count">${t.count > 0 ? t.count + '件の記事' : '—'}</div></div>
+    </a>`).join('');
+
+  // 企業グリッド
+  const coSummaries = (typeof getCompanySummaries === 'function') ? getCompanySummaries() : [];
+  document.getElementById('companies-mount').innerHTML = coSummaries.length > 0
+    ? coSummaries.slice(0, 8).map(c =>
+      `<a href="company.html?name=${encodeURIComponent(c.company_name)}" class="company-card">
+        <div class="company-logo-placeholder">${c.icon || '🏢'}</div>
+        <div class="company-card-name">${c.company_name}</div>
+        <div class="company-card-industry">${c.industry || ''}</div>
+        <div class="company-card-count">${c.article_count}件の記事</div>
+      </a>`).join('')
+    : '<p style="color:var(--ink-300);font-size:.88rem;text-align:center;padding:32px 0;grid-column:1/-1;">公開企業がありません</p>';
   const featEl   = document.getElementById('featured-mount');
   const featured = articles.slice().sort((a, b) => (b.total_score || 0) - (a.total_score || 0))[0];
   if (featured) {
