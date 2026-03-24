@@ -162,19 +162,19 @@
     </div>
     <div class="stats-grid">
       <div class="stat-card animate-in">
-        <div class="stat-num">248+</div>
-        <div class="stat-label">収録記事数</div>
+        <div class="stat-num" id="about-stat-articles">—</div>
+        <div class="stat-label">公開記事数</div>
         <div class="stat-desc">随時追加中</div>
       </div>
       <div class="stat-card animate-in">
-        <div class="stat-num">87社</div>
-        <div class="stat-label">掃載企業数</div>
+        <div class="stat-num" id="about-stat-companies">—</div>
+        <div class="stat-label">掲載企業数</div>
         <div class="stat-desc">東証プライム中心</div>
       </div>
       <div class="stat-card animate-in">
         <div class="stat-num">11</div>
         <div class="stat-label">テーマカテゴリ</div>
-        <div class="stat-desc">sdgs対応</div>
+        <div class="stat-desc">SDGs対応</div>
       </div>
       <div class="stat-card animate-in">
         <div class="stat-num">毎日</div>
@@ -284,12 +284,40 @@
 
 <script src="schema.js"></script>
 <script src="dummy-data.js"></script>
+<script src="sheets-api.js"></script>
 <script src="data.js"></script>
 <script>
 document.getElementById("header-mount").innerHTML = renderHeader("about.html");
 document.getElementById("footer-mount").innerHTML = renderFooter();
 initScrollAnimations();
 
+// GAS の stats エンドポイントから集計済みデータを取得
+// 承認ボタンが押されるたびに GAS 側が stats シートを更新しているので
+// ここでは stats シートの1行を読むだけ（超軽量）
+(async () => {
+  try {
+    const endpoint = (typeof SHEET_CONFIG !== 'undefined' && SHEET_CONFIG.GAS_ENDPOINT)
+      ? SHEET_CONFIG.GAS_ENDPOINT
+      : null;
+
+    if (!endpoint) return; // GAS未設定時はダッシュ表示のまま
+
+    const res  = await fetch(endpoint + '?action=getStats', { method: 'GET' });
+    const data = await res.json();
+
+    if (data.success) {
+      const artEl = document.getElementById("about-stat-articles");
+      const coEl  = document.getElementById("about-stat-companies");
+      if (artEl) artEl.textContent = data.article_count > 0 ? data.article_count + '件' : '—';
+      if (coEl)  coEl.textContent  = data.company_count > 0 ? data.company_count + '社' : '—';
+    }
+  } catch (err) {
+    // 取得失敗時は —（ダッシュ）のまま表示
+    console.warn('[About] stats取得失敗:', err.message);
+  }
+})();
+
+// FAQ アコーディオン
 function toggleFaq(el) {
   var item = el.closest(".faq-item");
   var isOpen = item.classList.contains("open");
