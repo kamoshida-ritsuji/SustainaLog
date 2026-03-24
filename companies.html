@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>企業別 — SustainaLog</title>
   <meta name="description" content="国内上場企業のCSR・サステナビリティ活動を企業・業界別に探せます。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="企業別 — SustainaLog">
+  <meta property="og:description" content="国内上場企業のCSR・サステナビリティ活動を企業・業界別に探せます。">
+  <meta property="og:site_name" content="SustainaLog">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="style.css">
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -82,15 +88,21 @@
 
 <section class="section">
   <div class="container">
+
+    <!-- Stats Bar -->
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-box-num" id="stat-cos">—</div><div class="stat-box-label">掲載企業数</div></div>
       <div class="stat-box"><div class="stat-box-num" id="stat-arts">—</div><div class="stat-box-label">公開記事数</div></div>
       <div class="stat-box"><div class="stat-box-num" id="stat-inds">—</div><div class="stat-box-label">業界カテゴリ</div></div>
     </div>
+
+    <!-- Search -->
     <div class="search-wrap" style="max-width:360px;margin-bottom:36px;">
       <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" class="search-input" placeholder="企業名・業界で検索..." id="companySearch" oninput="filterCompanies()">
     </div>
+
+    <!-- Companies by Industry -->
     <div id="companies-by-industry">
       <div style="text-align:center;padding:64px 0;">
         <div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;"></div>
@@ -110,40 +122,94 @@
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('companies.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
+
 let _allSummaries = [];
 let _loaded = false;
-function scoreToRankLabel(s) { return s>=22?'S':s>=18?'A':s>=13?'B':s>=8?'C':'D'; }
-function scoreToRankColor(s) { return s>=22?'#6a1fd1':s>=18?'#1565c0':s>=13?'#2e7d32':s>=8?'#f57c00':'#c62828'; }
+
+function scoreToRankLabel(score) {
+  if (score >= 22) return 'S';
+  if (score >= 18) return 'A';
+  if (score >= 13) return 'B';
+  if (score >= 8)  return 'C';
+  return 'D';
+}
+function scoreToRankColor(score) {
+  if (score >= 22) return '#6a1fd1';
+  if (score >= 18) return '#1565c0';
+  if (score >= 13) return '#2e7d32';
+  if (score >= 8)  return '#f57c00';
+  return '#c62828';
+}
+
 function renderByIndustry(list) {
   const container = document.getElementById('companies-by-industry');
-  if (list.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌿</div><h3>企業が覯つかりません</h3><p >検索条件を変えてお馱しください。</p></div>'; return; }
-  const industries = [...new Set(list.map(c=>c.industry).filter(Boolean))];
+  if (list.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🌿</div><h3>企業が見つかりません</h3><p>検索条件を変えてお試しください。</p></div>`;
+    return;
+  }
+
+  const industries = [...new Set(list.map(c => c.industry).filter(Boolean))];
+
   container.innerHTML = industries.map(ind => {
-    const comps = list.filter(c=>c.industry===ind);
-    return `<div class="industry-section animate-in"><div class="industry-header"><h2 class="industry-title">${ind}</h2><span class="industry-badge">${comps.length}社</span></div><div class="company-grid">${comps.map(c=>{
-      const nameEnc=encodeURIComponent(c.company_name);
-      const sl=c.avg_score>0?`平均${scoreToRankLabel(c.avg_score)}（${c.avg_score}）`:'';
-      const tick=c.ticker?`${c.ticker} · `:'';
-      const mkt=(typeof MARKET_LABEL!=='undefined'&&MARKET_LABEL[c.market])||c.market||'';
-      return `<a href="company.html?name=${nameEnc}" class="company-list-card"><div class="company-list-icon">${c.icon||'🏢'}</div><div class="company-list-info"><div class="company-list-name">${c.company_name}</div><div class="company-list-sub">${tick}${mkt}</div></div><div class="company-list-meta"><span class="company-list-count">${c.article_count}件</span>${sl?'<span class="company-list-score">'+sl+'</span>':''}</div></a>`;
-    }).join('')}</div></div>`;
+    const comps = list.filter(c => c.industry === ind);
+    return `
+      <div class="industry-section animate-in">
+        <div class="industry-header">
+          <h2 class="industry-title">${ind}</h2>
+          <span class="industry-badge">${comps.length}社</span>
+        </div>
+        <div class="company-grid">
+          ${comps.map(c => {
+            const nameEnc = encodeURIComponent(c.company_name);
+            const scoreLabel = c.avg_score > 0 ? `平均${scoreToRankLabel(c.avg_score)}（${c.avg_score}点）` : '';
+            const ticker = c.ticker ? `${c.ticker} · ` : '';
+            const market = (typeof MARKET_LABEL !== 'undefined' && MARKET_LABEL[c.market]) || c.market || '';
+            return `
+              <a href="company.html?name=${nameEnc}" class="company-list-card">
+                <div class="company-list-icon">${c.icon || '🏢'}</div>
+                <div class="company-list-info">
+                  <div class="company-list-name">${c.company_name}</div>
+                  <div class="company-list-sub">${ticker}${market}</div>
+                </div>
+                <div class="company-list-meta">
+                  <span class="company-list-count">${c.article_count}件</span>
+                  ${scoreLabel ? `<span class="company-list-score">${scoreLabel}</span>` : ''}
+                </div>
+              </a>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
   }).join('');
   initScrollAnimations();
 }
+
 function filterCompanies() {
-  if(!_loaded)return;
-  const q=(document.getElementById('companySearch').value||'').toLowerCase();
-  renderByIndustry(q?_allSummaries.filter(c=>c.company_name.toLowerCase().includes(q)||(c.industry||'').toLowerCase().includes(q)||(c.ticker||'').includes(q)):_allSummaries);
+  if (!_loaded) return;
+  const q = (document.getElementById('companySearch').value || '').toLowerCase();
+  const filtered = q
+    ? _allSummaries.filter(c =>
+        c.company_name.toLowerCase().includes(q) ||
+        (c.industry || '').toLowerCase().includes(q) ||
+        (c.ticker || '').includes(q)
+      )
+    : _allSummaries;
+  renderByIndustry(filtered);
 }
-(async()=>{
+
+(async () => {
   await loadPublicArticles();
-  _allSummaries=getCompanySummaries();
-  _loaded=true;
-  const inds=new Set(_allSummaries.map(c=>c.industry).filter(Boolean));
-  const totArts=_allSummaries.reduce((s,c)=>s+c.article_count,0);
-  document.getElementById('stat-cos').textContent=_allSummaries.length||'—';
-  document.getElementById('stat-arts').textContent=totArts||'—';
-  document.getElementById('stat-inds').textContent=inds.size||'—';
+  _allSummaries = getCompanySummaries();
+  _loaded = true;
+
+  // Stats
+  const industries = new Set(_allSummaries.map(c => c.industry).filter(Boolean));
+  const totalArts  = _allSummaries.reduce((s, c) => s + c.article_count, 0);
+  document.getElementById('stat-cos').textContent  = _allSummaries.length || '—';
+  document.getElementById('stat-arts').textContent = totalArts || '—';
+  document.getElementById('stat-inds').textContent = industries.size || '—';
+
   filterCompanies();
 })();
 </script>

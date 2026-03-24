@@ -4,44 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>企業詳細 — SustainaLog</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <meta name="description" content="企業のCSR・サステナビリティ活動の詳細。スコア・テーマ・活動頻度・関連記事を掲載。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="企業詳細 — SustainaLog">
+  <meta property="og:description" content="企業のCSR・サステナビリティ活動の詳細。スコア・テーマ・活動頻度・関連記事を掲載。">
+  <meta property="og:site_name" content="SustainaLog">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="style.css">
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─ Hero ─ */
     .co-hero { background: var(--green-900); padding: 48px 0 0; }
     .co-hero-inner { display: flex; align-items: flex-end; gap: 24px; padding-bottom: 40px; flex-wrap: wrap; }
-    .co-icon-wrap { width: 80px; height: 80px; border-radius: var(--radius-lg); background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; font-size: 2.6rem; flex-shrink: 0; }
+    .co-icon-wrap {
+      width: 80px; height: 80px; border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.12); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 2.6rem; flex-shrink: 0;
+    }
     .co-hero-body { flex: 1; min-width: 0; }
     .co-hero-eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--green-400); margin-bottom: 8px; }
     .co-hero-name { font-family: var(--font-serif); font-size: clamp(1.5rem, 4vw, 2.2rem); color: var(--cream); line-height: 1.2; margin-bottom: 10px; }
     .co-hero-tags { display: flex; gap: 8px; flex-wrap: wrap; }
     .co-hero-tag { font-size: .75rem; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: rgba(255,255,255,.12); color: var(--green-200); }
-    .co-stats { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--ink-100); overflow: hidden; margin-top: -1px; }
+
+    /* ─ Stats row ─ */
+    .co-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: var(--white); border-radius: var(--radius-lg);
+      border: 1px solid var(--ink-100);
+      overflow: hidden; margin-top: -1px;
+    }
     @media (max-width: 600px) { .co-stats { grid-template-columns: repeat(2, 1fr); } }
     .co-stat { padding: 20px 16px; text-align: center; border-right: 1px solid var(--ink-100); }
     .co-stat:last-child { border-right: none; }
     .co-stat-num { font-family: var(--font-serif); font-size: 1.8rem; color: var(--green-700); line-height: 1; margin-bottom: 6px; }
     .co-stat-label { font-size: .75rem; color: var(--ink-400); }
+
+    /* ─ Layout ─ */
     .co-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; margin-top: 40px; }
     @media (max-width: 900px) { .co-layout { grid-template-columns: 1fr; } }
-    .co-section-title { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-300); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--ink-100); }
+
+    /* ─ Section titles ─ */
+    .co-section-title {
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--ink-300);
+      margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+
+    /* ─ Theme pills ─ */
     .theme-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .theme-pill { display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 99px; font-size: .8rem; font-weight: 600; cursor: default; }
-    .co-sidebar-card { background: var(--white); border: 1px solid var(--ink-100); border-radius: var(--radius-lg); padding: 20px 22px; margin-bottom: 20px; }
+    .theme-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 99px;
+      font-size: .8rem; font-weight: 600; cursor: default;
+    }
+
+    /* ─ Sidebar card ─ */
+    .co-sidebar-card {
+      background: var(--white); border: 1px solid var(--ink-100);
+      border-radius: var(--radius-lg); padding: 20px 22px;
+      margin-bottom: 20px;
+    }
     .co-sidebar-title { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-400); margin-bottom: 14px; }
     .co-data-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--ink-100); font-size: .83rem; gap: 12px; }
     .co-data-row:last-child { border-bottom: none; }
     .co-data-label { color: var(--ink-400); font-weight: 600; flex-shrink: 0; }
     .co-data-value { color: var(--ink-700); text-align: right; word-break: break-all; }
+
+    /* ─ Score bar ─ */
     .co-score-bar { height: 6px; background: var(--ink-100); border-radius: 3px; overflow: hidden; margin: 4px 0 2px; }
     .co-score-fill { height: 100%; border-radius: 3px; }
-    .co-link-btn { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid var(--ink-100); border-radius: var(--radius-md); font-size: .82rem; font-weight: 600; color: var(--green-700); background: var(--green-50); transition: all var(--transition); margin-bottom: 8px; text-decoration: none; }
+
+    /* ─ Link button ─ */
+    .co-link-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border: 1px solid var(--ink-100);
+      border-radius: var(--radius-md); font-size: .82rem; font-weight: 600;
+      color: var(--green-700); background: var(--green-50);
+      transition: all var(--transition); margin-bottom: 8px;
+      text-decoration: none;
+    }
     .co-link-btn:hover { border-color: var(--green-400); background: var(--green-100); }
     .co-link-btn:last-child { margin-bottom: 0; }
+
+    /* ─ Activity bars ─ */
     .activity-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .activity-label { font-size: .75rem; color: var(--ink-500); width: 60px; flex-shrink: 0; }
     .activity-track { flex: 1; height: 6px; background: var(--ink-100); border-radius: 3px; overflow: hidden; }
     .activity-fill { height: 100%; background: var(--green-400); border-radius: 3px; }
     .activity-count { font-size: .72rem; font-family: var(--font-mono); color: var(--ink-300); width: 28px; text-align: right; }
+
+    /* ─ Back link ─ */
     .co-back { display: inline-flex; align-items: center; gap: 6px; font-size: .84rem; color: var(--green-400); margin-bottom: 24px; transition: gap var(--transition); }
     .co-back:hover { gap: 10px; color: var(--green-300); }
   </style>
@@ -51,7 +108,7 @@
 <div id="co-mount">
   <div style="text-align:center;padding:96px 24px;">
     <div style="width:40px;height:40px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px;"></div>
-    <p style="color:var(--ink-300);font-size:.9rem;">企業データゐ読み込み中...</p>
+    <p style="color:var(--ink-300);font-size:.9rem;">企業データを読み込み中...</p>
   </div>
 </div>
 <div id="footer-mount"></div>
@@ -64,49 +121,230 @@
 <script>
 document.getElementById('header-mount').innerHTML = renderHeader('companies.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
-const params = new URLSearchParams(window.location.search);
-const coName = params.get('name');
+
+const params   = new URLSearchParams(window.location.search);
+const coName   = params.get('name');
 const coTicker = params.get('ticker');
-function scoreColor(s) { return s>=22?'#6a1fd1':s>=18?'#1565c0':s>=13?'#2e7d32':s>=8?'#f57c00':'#c62828'; }
-function scoreLabel(s) { return s>=22?'S':s>=18?'A':s>=13?'B':s>=8?'C':'D'; }
-(async()=>{
+
+function scoreColor(s) {
+  if (s >= 22) return '#6a1fd1';
+  if (s >= 18) return '#1565c0';
+  if (s >= 13) return '#2e7d32';
+  if (s >= 8)  return '#f57c00';
+  return '#c62828';
+}
+function scoreLabel(s) {
+  if (s >= 22) return 'S'; if (s >= 18) return 'A';
+  if (s >= 13) return 'B'; if (s >= 8)  return 'C'; return 'D';
+}
+
+(async () => {
   await loadPublicArticles();
-  let co=null;
-  if(coName)co=getCompanySummaryByName(decodeURIComponent(coName));
-  if(!co&&coTicker)co=getCompanySummaries().find(c=>c.ticker===coTicker)||null;
-  const mount=document.getElementById('co-mount');
-  if(!co){mount.innerHTML=f<div class="container" style="padding:80px 24px;text-align:center;"><p style="font-size:3rem;margin-bottom:16px;">🌿</p><h2 style="font-family:var(--font-serif);margin-bottom:12px;">企業が見つかりませんでした</h2><p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いたいか、企業一覧から折しください。</p><a href="companies.html" class="btn btn-primary">企業一記へ</a></div>`;return;}
-  document.title=co.company_name+' — SustainaLog';
-  const market=(typeof MARKET_LABEL!=='undefined'&&MARKET_LABEL[co.market])||co.market||'—';
-  const avgRank=co.avg_score>0?scoreLabel(co.avg_score):'—';
-  const avgColor=co.avg_score>0?scoreColor(co.avg_score):'var(--ink-300)';
-  const now=new Date();
-  const mMap={};
-  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);mMap[`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`]=0;}
-  co.articles.forEach(a=>{const d=new Date(a.published_at||a.fetched_at||'');if(!isNaN(d)){const k=`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;if(k in mMap)mMap[k]++;}});
-  const maxM=Math.max(...Object.values(mMap),1);
-  const actHtml=Object.entries(mMap).map(([k,v])=>`<div class="activity-bar"><span class="activity-label">${k.slice(5)}月</span><div class="activity-track"><div class="activity-fill" style="width:${Math.round((v/maxM)*100)}%"></div></div><span class="activity-count">${v}</span></div>`).join('');
-  const csrM=typeof CSR_TYPE_META!=='undefined'?CSR_TYPE_META:{};
-  const tPills=co.themes.map(t=>{const m=csrM[t]||{};return `<span class="theme-pill" style="background:${m.color||'#d8f3dc'};color:${m.accent||'#2d6a4f'};">${m.icon||''} ${t}</span>`;}).join('');
-  const recent=co.articles.slice(0,6).map(adaptArticleForUI);
-  const recHtml=recent.length>0?`<div class="articles-grid">${recent.map(renderCard).join('')}</div>`:`<p style="color:var(--ink-300);font-size:.88rem;padding:24px 0;">公開記事がまちありません</p>`;
-  const sGrp={S:0,A:0,B:0,C:0,D:0};
-  co.articles.forEach(a=>{const r=scoreLabel(Number(a.total_score)||0);sGrp[r]++;});
-  const mSG=Math.max(...Object.values(sGrp),1);
-  const sBars=Object.entries(sGrp).map(([r,cnt])=>`<div class="activity-bar"><span class="activity-label" style="font-weight:700;color:${scoreColor(r==='S'?22:r==='A'?18:r==='B'?13:r==='C'?8:0)};">${r}</span><div class="activity-track"><div class="activity-fill" style="width:${Math.round((cnt/mSG)*100)}%;background:${scoreColor(r==='S'?22:r==='A'?18:r==='B'?13:r==='C'?8:0)};"></div></div><span class="activity-count">${cnt}</span></div>`).join('');
-  const links=[{label:'企業公式サイト',url:co.official_url,icon:'🏢"},{label:'サステナビリティ',url:co.sustainability_url,icon'🌿🋱'},{label:'IR情報',url:co.ir_url,icon:'💊'}].filter(l=>l!��ɰ��(������Ё�����!ѵ������̹��������񄁡ɕ������ɱ�хɝ���}�������ɕ�􉹽�����ȁ��ɕ���ɕȈ������􉍼�������Ѹ����������������������������������������屔������������\��������������������(����չй�����!Q50��(�����؁�����􉍼���ɼ���؁�����􉍽�х���Ȉ�񄁡ɕ�􉍽������̹�ѵ��������􉍼��������@��������������"�
-,���؁�����􉍼���ɼ�����Ȉ��؁�����􉍼�������Ʌ����퍼��������~>���𽑥���؁�����􉍼���ɼ��������������􉍼���ɼ��啉ɽ܈��퍼��������������ā�����􉍼���ɼ��������퍼��������}���������؁�����􉍼���ɼ�х�̈��퍼�ѥ�����������������􉍼���ɼ�х�������"7�
-ˎ�$��퍼�ѥ������������蜝�����ɭ���������������􉍼���ɼ�х�������ɭ����������蜝������������􉍼���ɼ�х���
-MK��
-׎
-��+�O����
-�������𽑥��𽑥��𽑥��𽑥��𽑥��(�����؁�����􉍽�х���Ȉ�(�������؁�����􉍼��х�̈��؁�����􉍼��хЈ��؁�����􉍼��хе�մ���퍼���ѥ���}��չ��𽑥���؁�����􉍼��хе����������Z/��c��/�V�𽑥��𽑥���؁�����􉍼��хЈ��؁�����􉍼��хе�մ����屔􉍽�����ٝ
-���������ٝI����𽑥���؁�����􉍼��хе���������ϖv�
-�
-ώ
-����ώ
-�𽑥��𽑥���؁�����􉍼��хЈ��؁�����􉍼��хе�մ���퍼��ٝ}͍�ɔ�������ٝ}͍�ɔ蟊P��𽑥���؁�����􉍼��хе���������ϖv�
-�
-ώ
-���ך #��F�c���F�c��F�b6�73�&6��7FB#��F�b6�73�&6��7FB��V�#�G�6��F�V�W2��V�wF����F�c��F�b6�73�&6��7FB��&V�#�K���h88n8;�89�i[��F�c���F�c���F�c��F�b6�73�&6�����WB#��F�c�G�6��F�V�W2��V�wF����F�b7G��S�&�&v���&�GF�ӣ3g��#��F�b6�73�&6��6V7F����F�F�R#�K��8�8�55.88n8;�89���F�c��F�b6�73�'F�V�R����2#�G�E���7���F�c���F�c��rwТ�F�c��F�b6�73�&6��6V7F����F�F�R#�i�ik8�h�.�Ȟ���K���ȂG�6��'F�6�U�6�V�G�K�nK��i�ikG��F��֖�b�6��'F�6�U�6�V�B��K�n�ȓ��F�c�G�&V4�F���G�6��'F�6�U�6�V�C�c��F�b7G��S�'FW�B�Ɩv�6V�FW#��&v���F��#G��#���&Vc�&'F�6�W2�F��"6�73�&'F�'F���WFƖ�R'F��6�"7G��S�&f��B�6��S��G&VӲ#�8>8�K�jZ�8�n���K��8).���K��K��jc�����F�c��rw���F�c���F�c��F�c��F�b6�73�&6��6�FV&"�6&B#��F�b6�73�&6��6�FV&"�F�F�R#�K�jZ�h8^Z��F�c��F�b6�73�&6��FF�&�r#��7�6�73�&6��FF��&V�#�K�jZ�Y���7���7�6�73�&6��FF�f�VR#�G�6��6������W���7����F�c��F�b6�73�&6��FF�&�r#��7�6�73�&6��FF��&V�#�jZ�yX���7���7�6�73�&6��FF�f�VR#�G�6���GW7G'���~(	Bw���7����F�c�G�6��F�6�W#��F�b6�73�&6��FF�&�r#��7�6�73�&6��FF��&V�#�X��8+.8;�88���7���7�6�73�&6��FF�f�VR"7G��S�&f��B�f֖Ǔ�f"���f��B�����#�G�6��F�6�W'���7����F�c��rw��F�b6�73�&6��FF�&�r#��7�6�73�&6��FF��&V�#�[�.ZC��7���7�6�73�&6��FF�f�VR#�G��&�WG���7����F�c�G�6���FW7E�FFS��F�b6�73�&6��FF�&�r#��7�6�73�&6��FF��&V�#�i�ij����K����7���7�6�73�&6��FF�f�VR#�G�f�&�DFFR�6���FW7E�FFR����7����F�c��rw���F�c�G�6��'F�6�U�6�V�C���F�b6�73�&6��6�FV&"�6&B#��F�b6�73�&6��6�FV&"�F�F�R#�8+�8+>8*.X�n[�3��F�c�G�4&'7��F�b7G��S�&�&v���F��'��F�7���f�W��Ɩv�֗FV�3�6V�FW#�v����#��7�7G��S�&f��B�f֖Ǔ�f"���f��B�����f��B�6��S��G&VӶf��B�vV�v�C�s�6���#�G�ft6���'Ӳ#�G�fu&����7���F�b7G��S�&f�W���#��F�b6�73�&6��66�&R�&"#��F�b6�73�&6��66�&R�f���"7G��S�'v�GF��G��F��&�V�B��6��fu�66�&R�#R����S�&6�w&�V�C�G�ft6���'Ӳ#���F�c���F�c��F�b7G��S�&f��B�f֖Ǔ�f"���f��B�����f��B�6��S��s'&VӶ6���#�f"��֖��3���&v���F��,G��#�[�>Y�rG�6��fu�66�&W��#^�+���F�c���F�c���F�c���F�c��rwТG�6��'F�6�U�6�V�C���F�b6�73�&6��6�FV&"�6&B#��F�b6�73�&6��6�FV&"�F�F�R#�i���8�k+K�X�^��[�n�ȎiȎX�^�ȓ��F�c�G�7D�F�����F�c��rwТG�Ɩ�2��V�wF����F�b6�73�&6��6�FV&"�6&B#��F�b6�73�&6��6�FV&"�F�F�R#�j.�
->8:�8;>8*���F�c�G�Ɩ�4�F�����F�c��rwТ��F�c���F�c���F�c�����E67&�����F���2����Ғ������67&�C���&�G�����F���
+
+  // 企業を検索
+  let co = null;
+  if (coName) co = getCompanySummaryByName(decodeURIComponent(coName));
+  if (!co && coTicker) {
+    co = getCompanySummaries().find(c => c.ticker === coTicker) || null;
+  }
+
+  const mount = document.getElementById('co-mount');
+
+  if (!co) {
+    mount.innerHTML = `
+      <div class="container" style="padding:80px 24px;text-align:center;">
+        <p style="font-size:3rem;margin-bottom:16px;">🌿</p>
+        <h2 style="font-family:var(--font-serif);margin-bottom:12px;">企業が見つかりませんでした</h2>
+        <p style="color:var(--ink-500);margin-bottom:24px;">URLをご確認いただくか、企業一覧からお探しください。</p>
+        <a href="companies.html" class="btn btn-primary">企業一覧へ</a>
+      </div>`;
+    return;
+  }
+
+  document.title = co.company_name + ' — SustainaLog';
+
+  // ─ 集計 ─────────────────────────────
+  const market = (typeof MARKET_LABEL !== 'undefined' && MARKET_LABEL[co.market]) || co.market || '—';
+  const avgRank  = co.avg_score > 0 ? scoreLabel(co.avg_score) : '—';
+  const avgColor = co.avg_score > 0 ? scoreColor(co.avg_score) : 'var(--ink-300)';
+
+  // 月別活動頻度（直近6ヶ月）
+  const now = new Date();
+  const monthlyMap = {};
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    monthlyMap[key] = 0;
+  }
+  co.articles.forEach(a => {
+    const d = new Date(a.published_at || a.fetched_at || '');
+    if (!isNaN(d)) {
+      const key = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;
+      if (key in monthlyMap) monthlyMap[key]++;
+    }
+  });
+  const maxMonthly = Math.max(...Object.values(monthlyMap), 1);
+  const activityHtml = Object.entries(monthlyMap).map(([k, v]) => `
+    <div class="activity-bar">
+      <span class="activity-label">${k.slice(5)}月</span>
+      <div class="activity-track"><div class="activity-fill" style="width:${Math.round((v/maxMonthly)*100)}%"></div></div>
+      <span class="activity-count">${v}</span>
+    </div>
+  `).join('');
+
+  // テーマ pill
+  const csrMeta = typeof CSR_TYPE_META !== 'undefined' ? CSR_TYPE_META : {};
+  const themePills = co.themes.map(t => {
+    const m = csrMeta[t] || {};
+    return `<span class="theme-pill" style="background:${m.color||'#d8f3dc'};color:${m.accent||'#2d6a4f'};">${m.icon||''} ${t}</span>`;
+  }).join('');
+
+  // 最新記事（最大6件）
+  const recent = co.articles.slice(0, 6).map(adaptArticleForUI);
+  const recentHtml = recent.length > 0
+    ? `<div class="articles-grid">${recent.map(renderCard).join('')}</div>`
+    : `<p style="color:var(--ink-300);font-size:.88rem;padding:24px 0;">公開記事がまだありません</p>`;
+
+  // スコア分布（5段階）
+  const scoreGroups = { S:0, A:0, B:0, C:0, D:0 };
+  co.articles.forEach(a => { const r = scoreLabel(Number(a.total_score)||0); scoreGroups[r]++; });
+  const maxSG = Math.max(...Object.values(scoreGroups), 1);
+  const scoreBarsHtml = Object.entries(scoreGroups).map(([r, cnt]) => `
+    <div class="activity-bar">
+      <span class="activity-label" style="font-weight:700;color:${scoreColor(r==='S'?22:r==='A'?18:r==='B'?13:r==='C'?8:0)};">${r}</span>
+      <div class="activity-track"><div class="activity-fill" style="width:${Math.round((cnt/maxSG)*100)}%;background:${scoreColor(r==='S'?22:r==='A'?18:r==='B'?13:r==='C'?8:0)};"></div></div>
+      <span class="activity-count">${cnt}</span>
+    </div>
+  `).join('');
+
+  // リンク群
+  const links = [
+    { label: '公式サイト', url: co.official_url, icon: '🏢' },
+    { label: 'サステナビリティ', url: co.sustainability_url, icon: '🌿' },
+    { label: 'IR情報', url: co.ir_url, icon: '📊' },
+  ].filter(l => l.url);
+  const linksHtml = links.map(l => `
+    <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="co-link-btn">
+      <span>${l.icon} ${l.label}</span><span style="opacity:.5;">↗</span>
+    </a>
+  `).join('');
+
+  mount.innerHTML = `
+    <!-- Hero -->
+    <div class="co-hero">
+      <div class="container">
+        <a href="companies.html" class="co-back">← 企業一覧に戻る</a>
+        <div style="float:right;margin-top:0;">
+          <a href="compare.html?a=${encodeURIComponent(co.company_name)}" class="btn btn-outline btn-sm" style="font-size:.76rem;background:rgba(255,255,255,.12);color:var(--green-200);border-color:rgba(255,255,255,.25);">🔍 他社と比較</a>
+        </div>
+        <div class="co-hero-inner">
+          <div class="co-icon-wrap">${co.icon || '🏢'}</div>
+          <div class="co-hero-body">
+            <p class="co-hero-eyebrow">${co.industry}</p>
+            <h1 class="co-hero-name">${co.company_name}</h1>
+            <div class="co-hero-tags">
+              ${co.ticker ? `<span class="co-hero-tag">証券コード ${co.ticker}</span>` : ''}
+              ${market ? `<span class="co-hero-tag">${market}</span>` : ''}
+              <span class="co-hero-tag">CSR・サステナビリティ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="container">
+      <div class="co-stats">
+        <div class="co-stat">
+          <div class="co-stat-num">${co.article_count}</div>
+          <div class="co-stat-label">公開記事数</div>
+        </div>
+        <div class="co-stat">
+          <div class="co-stat-num" style="color:${avgColor};">${avgRank}</div>
+          <div class="co-stat-label">平均スコアランク</div>
+        </div>
+        <div class="co-stat">
+          <div class="co-stat-num">${co.avg_score > 0 ? co.avg_score : '—'}</div>
+          <div class="co-stat-label">平均スコア（/25）</div>
+        </div>
+        <div class="co-stat">
+          <div class="co-stat-num">${co.themes.length}</div>
+          <div class="co-stat-label">主要テーマ数</div>
+        </div>
+      </div>
+
+      <!-- 2-column layout -->
+      <div class="co-layout">
+        <!-- Main -->
+        <div>
+          <!-- テーマ -->
+          ${co.themes.length > 0 ? `
+          <div style="margin-bottom:36px;">
+            <div class="co-section-title">主なCSRテーマ</div>
+            <div class="theme-pills">${themePills}</div>
+          </div>` : ''}
+
+          <!-- 最新記事 -->
+          <div>
+            <div class="co-section-title">最新の掲載記事（${co.article_count}件中 最新${Math.min(6, co.article_count)}件）</div>
+            ${recentHtml}
+            ${co.article_count > 6 ? `
+            <div style="text-align:center;margin-top:24px;">
+              <a href="articles.html" class="btn btn-outline btn-sm" style="font-size:.84rem;">
+                この企業の全記事を記事一覧で見る →
+              </a>
+            </div>` : ''}
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <!-- 企業情報 -->
+          <div class="co-sidebar-card">
+            <div class="co-sidebar-title">企業情報</div>
+            <div class="co-data-row"><span class="co-data-label">企業名</span><span class="co-data-value">${co.company_name}</span></div>
+            <div class="co-data-row"><span class="co-data-label">業界</span><span class="co-data-value">${co.industry || '—'}</span></div>
+            ${co.ticker ? `<div class="co-data-row"><span class="co-data-label">証券コード</span><span class="co-data-value" style="font-family:var(--font-mono);">${co.ticker}</span></div>` : ''}
+            <div class="co-data-row"><span class="co-data-label">市場</span><span class="co-data-value">${market}</span></div>
+            ${co.latest_date ? `<div class="co-data-row"><span class="co-data-label">最新記事</span><span class="co-data-value">${formatDate(co.latest_date)}</span></div>` : ''}
+          </div>
+
+          <!-- スコア分布 -->
+          ${co.article_count > 0 ? `
+          <div class="co-sidebar-card">
+            <div class="co-sidebar-title">スコア分布</div>
+            ${scoreBarsHtml}
+            <div style="margin-top:12px;display:flex;align-items:center;gap:8px;">
+              <span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:${avgColor};">${avgRank}</span>
+              <div style="flex:1;">
+                <div class="co-score-bar">
+                  <div class="co-score-fill" style="width:${Math.round((co.avg_score/25)*100)}%;background:${avgColor};"></div>
+                </div>
+                <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--ink-300);margin-top:2px;">平均 ${co.avg_score}/25点</div>
+              </div>
+            </div>
+          </div>` : ''}
+
+          <!-- 活動頻度 -->
+          ${co.article_count > 0 ? `
+          <div class="co-sidebar-card">
+            <div class="co-sidebar-title">最近の活動頻度（月別）</div>
+            ${activityHtml}
+          </div>` : ''}
+
+          <!-- 関連リンク -->
+          ${links.length > 0 ? `
+          <div class="co-sidebar-card">
+            <div class="co-sidebar-title">関連リンク</div>
+            ${linksHtml}
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  initScrollAnimations();
+})();
+</script>
+</body>
+</html>

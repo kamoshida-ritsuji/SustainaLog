@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>分析ダッシュボード — SustainaLog</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <meta name="description" content="国内企業のCSR・サステナビリティ活動データの分析ダッシュボード。業界・テーマ・企業別の統計。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="分析ダッシュボード — SustainaLog">
+  <meta property="og:description" content="国内企業のCSR・サステナビリティ活動データの分析ダッシュボード。業界・テーマ・企業別の統計。">
+  <meta property="og:site_name" content="SustainaLog">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="style.css">
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -178,7 +185,7 @@
   <div class="container">
     <p class="page-hero-label">Dashboard</p>
     <h1>分析ダッシュボード</h1>
-    <p>CSR・サステナビリティ活動のトレンドと企業動向をひと砮で把握できます。</p>
+    <p>CSR・サステナビリティ活動のトレンドと企業動向をひと目で把握できます。</p>
   </div>
 </div>
 
@@ -186,7 +193,7 @@
   <div class="container" id="dash-mount">
     <div style="text-align:center;padding:80px 0;">
       <div style="width:40px;height:40px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 20px;"></div>
-      <p style="color:var(--ink-300);font-size:.9rem;">データを詻袝中...</p>
+      <p style="color:var(--ink-300);font-size:.9rem;">データを集計中...</p>
     </div>
   </div>
 </section>
@@ -393,7 +400,7 @@ function buildScoreDist(articles) {
         <div style="height:3px;background:#40916c;position:absolute;top:0;left:0;right:0;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
         <div class="kpi-num" style="color:#40916c;">${totalCos || '—'}</div>
         <div class="kpi-label">掲載企業数</div>
-        <div class="kpi-sub">ユドーク</div>
+        <div class="kpi-sub">ユニーク</div>
       </div>
       <div class="kpi-card">
         <div style="height:3px;background:#6b46c1;position:absolute;top:0;left:0;right:0;border-radius:var(--radius-lg) var(--radius-lg) 0 0;"></div>
