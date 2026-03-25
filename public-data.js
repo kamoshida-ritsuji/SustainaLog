@@ -1,7 +1,7 @@
 // ============================================================
 // SustainaLog — 公開用データレイヤー
 // ============================================================
-// 本番サイト（index / articles / article）専甮。
+// 本番サイト（index / articles / article）専用。
 // Google Sheets から published 記事だけを取得し、
 // キャッシュして各ページに提供する。
 //
@@ -28,15 +28,15 @@ async function loadPublicArticles() {
   if (_publicArticles !== null) return;
   if (!isSheetsConfigured()) {
     _publicArticles = filterPublished(typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : []);
-    _publicSource = 'fallback'; _publicError = 'SPREADSHEET_ID 朊譭定'; return;
+    _publicSource = 'fallback'; _publicError = 'SPREADSHEET_ID 未設定'; return;
   }
   try {
     const result = await fetchArticlesFromSheets();
     _publicArticles = filterPublished(result.data || []);
     _publicSource = result.source || 'sheets'; _publicError = result.error || null;
-    console.info('[PublicData]', _publicArticles.length, '六阯記事込み中');
+    console.info('[PublicData]', _publicArticles.length, '件の記事を読み込みました');
   } catch (err) {
-    console.error('[PublicData]取得権向:', err.message);
+    console.error('[PublicData]取得エラー:', err.message);
     _publicArticles = filterPublished(typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : []);
     _publicSource = 'fallback'; _publicError = err.message;
   }
@@ -62,7 +62,7 @@ function getPublishedArticles() {
 }
 function getArticleBySlug(s) { return getPublicArticleBySlug(s); }
 
-// 朂業�f�計
+// 企業集計
 function getCompanySummaries() {
   const articles = getPublicArticles();
   if (articles.length === 0) {
@@ -118,7 +118,7 @@ function getCompanySummaries() {
 function getCompanySummaryByName(n) { return getCompanySummaries().find(c=>c.company_name===n)||null; }
 function getCompanySummariesByIndustry(i) { return getCompanySummaries().filter(c=>c.industry===i); }
 
-// テーマi��計
+// テーマ集計
 function getThemeSummaries() {
   const articles = getPublicArticles();
   const meta = (typeof CSR_TYPE_META !== 'undefined') ? CSR_TYPE_META : {};
