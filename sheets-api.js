@@ -5,7 +5,7 @@
 
 const SHEET_CONFIG = {
   SPREADSHEET_ID: '14iuJbOXao3FnwKsByAgJBzACPIPu2DtZWkhmp0frXQk',
-  GAS_ENDPOINT: 'https://script.google.com/macros/s/AKfycby3ZPJ7C6EcdlVyjcQWid7hjkuGyWy2LqEq-pXSKRyJVKXMxJsVv99BZPj8fzOPhows/exec',
+  GAS_ENDPOINT: 'https://script.google.com/macros/s/AKfycbyjr9un3qZYaFSPFxkgE3Ii_XKYoBh3OZK3SKVjekkcxaPD4Ssp1UP9Q7oCEnO9aL35OA/exec',
   ARTICLES_SHEET_NAME:  'articles',
   COMPANIES_SHEET_NAME: 'companies',
   TIMEOUT_MS: 8000,
