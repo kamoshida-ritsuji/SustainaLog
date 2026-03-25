@@ -1,115 +1,77 @@
-// ============================================================
-// SustainaLog — Google Sheets 読み取り＆書き込みライブラリ
-// ============================================================
+// ==============================================
+// SustainaLog — Google Sheets 読み取り&書き込みライブラリ
+// ==============================================
 'use strict';
 
 const SHEET_CONFIG = {
-  SPREADSHEET_ID: '14iuJbOXao3FnwKsByAgJBzACPIPu2DtZWkhmp0frXQk',
+  SPREADSHEET_ID: '13gnNz6wLTOOVF66V0fVT489drmmZF6J_0nGo4cTXQm0',
   GAS_ENDPOINT: 'https://script.google.com/macros/s/AKfycbyjr9un3qZYaFSPFxkgE3Ii_XKYoBh3OZK3SKVjekkcxaPD4Ssp1UP9Q7oCEnO9aL35OA/exec',
-  ARTICLES_SHEET_NAME:  'articles',
+  ARTICLES_SHEET_NAME: 'articles',
   COMPANIES_SHEET_NAME: 'companies',
-  TIMEOUT_MS: 8000,
+  TIMEOUT_MS: 10000,
 };
 
-function buildCsvUrl(sheetName) {
-  return 'https://docs.google.com/spreadsheets/d/' + SHEET_CONFIG.SPREADSHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
-}
-
-function parseCsv(text) {
-  const rows = [];
-  let row = [], field = '', inQuotes = false, i = 0;
-  while (i < text.length) {
-    const ch = text[i], next = text[i + 1];
-    if (inQuotes) {
-      if (ch === '"' && next === '"') { field += '"'; i += 2; }
-      else if (ch === '"') { inQuotes = false; i++; }
-      else { field += ch; i++; }
-    } else {
-      if (ch === '"') { inQuotes = true; i++; }
-      else if (ch === ',') { row.push(field); field = ''; i++; }
-      else if (ch === '\r' && next === '\n') { row.push(field); rows.push(row); row = []; field = ''; i += 2; }
-      else if (ch === '\n' || ch === '\r') { row.push(field); rows.push(row); row = []; field = ''; i++; }
-      else { field += ch; i++; }
-    }
-  }
-  if (field || row.length > 0) { row.push(field); if (row.some(f => f !== '')) rows.push(row); }
-  return rows;
-}
-
-function csvToObjects(rows) {
-  if (!rows || rows.length < 2) return [];
-  const headers = rows[0].map(h => h.trim());
-  return rows.slice(1).filter(r => r.some(c => c.trim() !== '')).map(row => {
-    const obj = {}; headers.forEach((h, i) => { obj[h] = (row[i] || '').trim(); }); return obj;
-  });
-}
-
-async function fetchWithTimeout(url, ms) {
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
-  try { const r = await fetch(url, { signal: ctrl.signal }); clearTimeout(t); return r; }
-  catch(e) { clearTimeout(t); throw e; }
-}
-
+// GAS経由でarticlesを取得
 async function fetchArticlesFromSheets() {
-  if (!SHEET_CONFIG.SPREADSHEET_ID || SHEET_CONFIG.SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-    console.warn('[SheetsAPI] SPREADSHEET_ID未設定。');
-    return { data: typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : [], error: 'SPREADSHEET_ID未設定', source: 'fallback' };
-  }
-  try {
-    const res = await fetchWithTimeout(buildCsvUrl(SHEET_CONFIG.ARTICLES_SHEET_NAME), SHEET_CONFIG.TIMEOUT_MS);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    if (text.includes('<!DOCTYPE') || text.includes('<html')) throw new Error('シートが非公開です。');
-    const valid = csvToObjects(parseCsv(text)).map(r => normalizeFromSheets(r)).filter(a => a.article_id && a.translated_title);
-    console.info('[SheetsAPI] ' + valid.length + '件取得');
-    return { data: valid, error: null, source: 'sheets' };
-  } catch(err) {
-    console.error('[SheetsAPI] 取得エラー:', err.message);
-    return { data: typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : [], error: err.message, source: 'fallback' };
-  }
-}
-
-async function fetchCompaniesFromSheets() {
-  if (!SHEET_CONFIG.SPREADSHEET_ID || SHEET_CONFIG.SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-    return { data: typeof COMPANY_MASTER !== 'undefined' ? COMPANY_MASTER : [], error: 'SPREADSHEET_ID未設定' };
-  }
-  try {
-    const res = await fetchWithTimeout(buildCsvUrl(SHEET_CONFIG.COMPANIES_SHEET_NAME), SHEET_CONFIG.TIMEOUT_MS);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    if (text.includes('<!DOCTYPE') || text.includes('<html')) throw new Error('非公開');
-    return { data: csvToObjects(parseCsv(text)).map(r => normalizeFromSheets(r)), error: null };
-  } catch(err) {
-    return { data: typeof COMPANY_MASTER !== 'undefined' ? COMPANY_MASTER : [], error: err.message };
-  }
-}
-
-async function updateStatusInSheets(articleId, newStatus) {
   if (!SHEET_CONFIG.GAS_ENDPOINT || SHEET_CONFIG.GAS_ENDPOINT === 'YOUR_GAS_ENDPOINT_HERE') {
     console.warn('[SheetsAPI] GAS_ENDPOINT未設定。ローカルのみ。');
-    return { success: true, error: null, localOnly: true };
+    return { data: typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : [], source: 'fallback', error: 'GAS_ENDPOINT未設定' };
   }
-  console.info('[SheetsAPI] updateStatus: ' + articleId + ' -> ' + newStatus);
   try {
-    await fetch(SHEET_CONFIG.GAS_ENDPOINT, {
+    const url = SHEET_CONFIG.GAS_ENDPOINT + '?sheet=articles';
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), SHEET_CONFIG.TIMEOUT_MS);
+    const resp = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const json = await resp.json();
+    if (json.error) throw new Error(json.error);
+    const articles = json.articles || [];
+    console.log(`[SheetsAPI] GAS経由で${articles.length}件取得`);
+    return { data: articles, source: 'sheets', error: null };
+  } catch (e) {
+    console.warn('[SheetsAPI] GAS取得エラー:', e.message);
+    return { data: typeof DUMMY_ARTICLES !== 'undefined' ? DUMMY_ARTICLES : [], source: 'fallback', error: e.message };
+  }
+}
+
+// GAS経由でステータス更新
+async function updateStatusInSheets(articleId, newStatus) {
+  if (!SHEET_CONFIG.GAS_ENDPOINT || SHEET_CONFIG.GAS_ENDPOINT === 'YOUR_GAS_ENDPOINT_HERE') {
+    return { success: false, error: 'GAS_ENDPOINT未設定' };
+  }
+  try {
+    const resp = await fetch(SHEET_CONFIG.GAS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'updateStatus', article_id: articleId, status: newStatus }),
-      mode: 'no-cors',
     });
-    console.info('[SheetsAPI] 送信完了: ' + articleId + ' -> ' + newStatus);
-    return { success: true, error: null };
-  } catch(err) {
-    console.error('[SheetsAPI] 更新エラー:', err.message);
-    return { success: false, error: err.message };
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const json = await resp.json();
+    if (json.error) throw new Error(json.error);
+    return { success: true };
+  } catch (e) {
+    console.warn('[SheetsAPI] updateStatus エラー:', e.message);
+    return { success: false, error: e.message };
   }
 }
 
-function isSheetsConfigured() {
-  return !!(SHEET_CONFIG.SPREADSHEET_ID && SHEET_CONFIG.SPREADSHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE');
+// GAS経由でcompaniesを取得
+async function fetchCompaniesFromSheets() {
+  if (!SHEET_CONFIG.GAS_ENDPOINT || SHEET_CONFIG.GAS_ENDPOINT === 'YOUR_GAS_ENDPOINT_HERE') {
+    return { data: typeof COMPANY_MASTER !== 'undefined' ? COMPANY_MASTER : [], source: 'fallback' };
+  }
+  try {
+    const url = SHEET_CONFIG.GAS_ENDPOINT + '?sheet=companies';
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const json = await resp.json();
+    return { data: json.articles || [], source: 'sheets' };
+  } catch (e) {
+    return { data: typeof COMPANY_MASTER !== 'undefined' ? COMPANY_MASTER : [], source: 'fallback' };
+  }
 }
 
 function isWriteEnabled() {
-  return !!(SHEET_CONFIG.GAS_ENDPOINT && SHEET_CONFIG.GAS_ENDPOINT !== 'YOUR_GAS_ENDPOINT_HERE');
-}
+  return !!(SHEET_CONFIG.GAS_ENDPOINT && SHEET_CONFIG.GAS_ENDPOINT !== 'YOUR_GAS_ENDPOI
+
