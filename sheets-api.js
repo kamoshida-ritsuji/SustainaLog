@@ -34,6 +34,16 @@ async function fetchCompaniesFromSheets() {
 }
 async function updateStatusInSheets(articleId, newStatus) {
   try {
+    const url = SHEET_CONFIG.GAS_ENDPOINT + `?action=updateStatus&article_id=` + encodeURIComponent(articleId) + `&status=` + encodeURIComponent(newStatus);
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const json = await resp.json();
+    if (json.error) throw new Error(json.error);
+    return { success: true };
+  } catch(e) { return { success: false, error: e.message }; }
+}
+async function updateStatusInSheets_OLD(articleId, newStatus) {
+  try {
     const resp = await fetch(SHEET_CONFIG.GAS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
