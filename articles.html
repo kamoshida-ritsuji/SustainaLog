@@ -68,14 +68,14 @@
     <div id="articles-grid">
       <div style="grid-column:1/-1;text-align:center;padding:64px 0;">
         <div style="width:36px;height:36px;border:3px solid var(--ink-100);border-top-color:var(--green-500);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;"></div>
-        <p style="color:var(--ink-300);font-size:.88rem;">記事ゐ読み込み中...</p>
+        <p style="color:var(--ink-300);font-size:.88rem;">記事を読み込み中...</p>
       </div>
     </div>
 
     <div class="empty-state" id="empty-state" style="display:none;">
       <div class="empty-state-icon">🌱</div>
-      <h3>記事が覯つかりませんでした</h3>
-      <p>検索条件を変えてお馱しください。</p>
+      <h3>記事が見つかりませんでした</h3>
+      <p>検索条件を変えてお試しください。</p>
     </div>
 
     <div class="pagination" id="pagination"></div>
@@ -90,7 +90,7 @@
 <script src="public-data.js"></script>
 <script src="data.js"></script>
 <script>
-d��ument.getElementById('header-mount').innerHTML = renderHeader('articles.html');
+document.getElementById('header-mount').innerHTML = renderHeader('articles.html');
 document.getElementById('footer-mount').innerHTML = renderFooter();
 
 let activeTheme    = '';
@@ -124,7 +124,7 @@ function filterArticles() {
   const grid  = document.getElementById('articles-grid');
   const empty = document.getElementById('empty-state');
   const count = document.getElementById('result-count');
-  count.textContent = `${filtered.length}뻶の記事`;
+  count.textContent = `${filtered.length}件の記事`;
   if (filtered.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; }
   else { empty.style.display = 'none'; grid.className = 'articles-grid'; grid.innerHTML = filtered.map(renderCard).join(''); initScrollAnimations(); }
   const pag = document.getElementById('pagination');
