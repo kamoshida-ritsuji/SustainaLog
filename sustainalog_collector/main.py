@@ -285,7 +285,7 @@ def fetch_article_body(url: str) -> str:
 # Claude API
 # ============================================================
 
-CLAUDE_MODEL   = "claude-sonnet-4-20250514"
+CLAUDE_MODEL   = "claude-haiku-4-5-20251001"
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 
 ANALYSIS_SYSTEM = """あなたは日本企業のCSR・サステナビリティ活動を分析する専門アナリストです。
