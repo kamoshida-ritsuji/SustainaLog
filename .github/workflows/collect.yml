@@ -1,7 +1,7 @@
-name: Daily CSR News Collection
+name: Weekly CSR News Collection
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 22 * * 0'
   workflow_dispatch:
 jobs:
   collect:
@@ -20,7 +20,7 @@ jobs:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           GAS_WEBHOOK_URL: ${{ secrets.GAS_WEBHOOK_URL }}
         run: cd sustainalog_collector && python main.py --init
-      - name: Run daily collection
+      - name: Run weekly collection
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
